@@ -1,6 +1,29 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@screens/*": ["./src/screens/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@routes/*": ["./src/routes/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true
+  },
+  "exclude": [
+    ".expo",
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "ios",
+    "android",
+    "jest.config.js"
+  ],
+  "include": ["**/*.ts", "**/*.tsx"]
 }
