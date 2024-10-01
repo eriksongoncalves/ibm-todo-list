@@ -8,6 +8,8 @@ import {
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SignIn } from '@screens/Signin'
+import { ThemeProvider } from 'styled-components/native'
+import { theme } from '@shared/theme'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -29,8 +31,10 @@ export default function App() {
 
   return (
     <GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1 }}>
-      <StatusBar style="light" backgroundColor="transparent" translucent />
-      <SignIn />
+      <ThemeProvider theme={theme}>
+        <StatusBar style="light" backgroundColor="transparent" translucent />
+        <SignIn />
+      </ThemeProvider>
     </GestureHandlerRootView>
   )
 }

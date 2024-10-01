@@ -1,24 +1,19 @@
-import {
-  View,
-  Text,
-  Alert,
-  SafeAreaView,
-  Image,
-  TouchableWithoutFeedback,
-  Keyboard
-} from 'react-native'
-import { useForm } from 'react-hook-form'
+import { Alert, Image, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { useForm, Controller } from 'react-hook-form'
 
 import appLogoIcon from '@assets/images/app-logo-icon.png'
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
+import { Text } from '@components/Text'
+
+import * as S from './styles'
 import { SignInFormData, signInFormResolver } from './validationSchema'
 
 export function SignIn() {
   const {
     register,
     handleSubmit,
-    setValue,
+    control,
     formState: { errors }
   } = useForm<SignInFormData>({
     resolver: signInFormResolver,
@@ -35,78 +30,85 @@ export function SignIn() {
   }
 
   return (
-    <View className="flex-1 bg-gray-600">
-      <View
-        className={`w-full flex-1 rounded-b-3xl bg-gray-700 pb-8 pl-8 pr-8`}
-      >
-        <TouchableWithoutFeedback
-          onPress={Keyboard.dismiss}
-          accessible={false}
-          className="flex-1"
-        >
-          <SafeAreaView className="flex-1">
-            <View className="mt-12 items-center">
-              <Image
-                source={appLogoIcon}
-                style={{ width: 80, height: 80 }}
-                resizeMode="contain"
-              />
-              <Text className="mt-5 font-robotoBold text-xl text-white">
-                TODO-LIST
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <S.Wrapper>
+        <S.ContentWrapper>
+          <S.LogoWrapper>
+            <Image
+              source={appLogoIcon}
+              style={{ width: 80, height: 80 }}
+              resizeMode="contain"
+            />
+            <Text fontFamily="robotoBold" size={20} color="white" mt={16}>
+              TODO-LIST
+            </Text>
+          </S.LogoWrapper>
+
+          <S.FormWrapper>
+            <Text
+              mb={16}
+              align="center"
+              fontFamily="robotoBold"
+              size={18}
+              color="white"
+            >
+              Acesse sua conta
+            </Text>
+
+            <Controller
+              name="email"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  {...register('email')}
+                  placeholder="E-mail"
+                  keyboardType="email-address"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.email?.message}
+                  mb={16}
+                />
+              )}
+            />
+
+            <Controller
+              name="password"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  {...register('password')}
+                  placeholder="Senha"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.password?.message}
+                  returnKeyLabel="Acessar"
+                  onSubmitEditing={handleSubmit(onSubmit)}
+                  mb={16}
+                />
+              )}
+            />
+
+            <Button onPress={handleSubmit(onSubmit)} disabled={false}>
+              <Text fontFamily="robotoBold" color="white">
+                Acessar
               </Text>
-            </View>
+            </Button>
+          </S.FormWrapper>
+        </S.ContentWrapper>
 
-            <View className="mt-20 w-full">
-              <Text className="mb-4 text-center font-robotoBold text-lg text-white">
-                Acesse sua conta
-              </Text>
-
-              <Input
-                {...register('email')}
-                placeholder="E-mail"
-                keyboardType="email-address"
-                className="mb-4"
-                onChangeText={value => setValue('email', value)}
-                errorMessage={errors.email?.message}
-              />
-
-              <Input
-                {...register('password')}
-                placeholder="Senha"
-                className="mb-4"
-                secureTextEntry
-                onChangeText={value => setValue('password', value)}
-                errorMessage={errors.password?.message}
-                returnKeyLabel="Acessar"
-                onSubmitEditing={handleSubmit(onSubmit)}
-              />
-
-              <Button onPress={handleSubmit(onSubmit)} disabled={false}>
-                <Text className="font-robotoBold text-base text-white">
-                  Acessar
-                </Text>
-              </Button>
-            </View>
-          </SafeAreaView>
-        </TouchableWithoutFeedback>
-      </View>
-
-      <View className="mt-10 w-full pb-16 pl-8 pr-8">
-        <Text className="mb-3 text-center font-robotoRegular text-base text-white">
-          Ainda não tem acesso?
-        </Text>
-
-        <Button
-          variant="outline"
-          onPress={() => {}}
-          className="mb-4"
-          disabled={false}
-        >
-          <Text className="font-robotoBold text-base text-green-500">
-            Criar conta
+        <S.BottomWrapper>
+          <Text fontFamily="robotoRegular" color="white" mb={12} align="center">
+            Ainda não tem acesso?
           </Text>
-        </Button>
-      </View>
-    </View>
+
+          <Button variant="outline" onPress={() => {}} disabled={false}>
+            <Text fontFamily="robotoBold" color="green_500">
+              Criar conta
+            </Text>
+          </Button>
+        </S.BottomWrapper>
+      </S.Wrapper>
+    </TouchableWithoutFeedback>
   )
 }

@@ -1,55 +1,32 @@
-import { useState } from 'react'
-import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
-import { tv, VariantProps } from 'tailwind-variants'
+import { TouchableOpacityProps } from 'react-native'
 
-const variants = tv({
-  base: 'rounded-8 w-full items-center rounded p-4',
-  variants: {
-    variant: {
-      default: 'border-green-700 bg-green-700',
-      outline: 'border border-green-500 bg-transparent',
-      ghost: 'w-auto p-0'
-    }
-  },
+import * as S from './styles'
+import { Spacing } from '@shared/theme'
 
-  defaultVariants: {
-    variant: 'default'
-  }
-})
-
-type ButtonVariants = VariantProps<typeof variants>
+export type ButtonVariant = 'default' | 'outline' | 'ghost'
 
 type ButtonProps = {
-  className?: string
-} & ButtonVariants &
-  Omit<TouchableOpacityProps, 'onPressIn' | 'onPressOut'>
+  variant?: ButtonVariant
+  mt?: Spacing
+  mb?: Spacing
+} & TouchableOpacityProps
 
-export function Button({ className, children, variant, ...rest }: ButtonProps) {
-  const [activeClasses, setActiveClasses] = useState('')
-
-  function handlePressIn() {
-    const activeVariants = {
-      default: 'border-green-500 bg-green-500',
-      outline: 'border-green-700 bg-green-700',
-      ghost: ''
-    }
-
-    setActiveClasses(activeVariants[variant!])
-  }
-
-  function handlePressOut() {
-    setActiveClasses('')
-  }
-
+export function Button({
+  children,
+  variant = 'default',
+  mb,
+  mt,
+  ...rest
+}: ButtonProps) {
   return (
-    <TouchableOpacity
+    <S.ButtonWrapper
       activeOpacity={0.7}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      className={variants({ variant, className: activeClasses })}
+      variant={variant}
+      mb={mb}
+      mt={mt}
       {...rest}
     >
       {children}
-    </TouchableOpacity>
+    </S.ButtonWrapper>
   )
 }
