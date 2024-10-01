@@ -34,7 +34,7 @@ export const LogoWrapper = styled.View`
 export const FormWrapper = styled.View`
   width: 100%;
   padding-bottom: 32px;
-  margin-top: 40px;
+  margin-top: 70px;
 `
 
 export const BottomWrapper = styled.View`
