@@ -36,13 +36,15 @@ export function SignIn() {
 
   return (
     <View className="flex-1 bg-gray-600">
-      <View className={`w-full flex-1 rounded-b-3xl bg-gray-700 pl-8 pr-8`}>
+      <View
+        className={`w-full flex-1 rounded-b-3xl bg-gray-700 pb-8 pl-8 pr-8`}
+      >
         <TouchableWithoutFeedback
           onPress={Keyboard.dismiss}
           accessible={false}
           className="flex-1"
         >
-          <SafeAreaView>
+          <SafeAreaView className="flex-1">
             <View className="mt-12 items-center">
               <Image
                 source={appLogoIcon}
@@ -89,7 +91,7 @@ export function SignIn() {
         </TouchableWithoutFeedback>
       </View>
 
-      <View className="mt-16 w-full pb-20 pl-8 pr-8">
+      <View className="mt-10 w-full pb-16 pl-8 pr-8">
         <Text className="mb-3 text-center font-robotoRegular text-base text-white">
           Ainda não tem acesso?
         </Text>
