@@ -9,7 +9,8 @@
       "@screens/*": ["./src/screens/*"],
       "@assets/*": ["./src/assets/*"],
       "@shared/*": ["./src/shared/*"],
-      "@routes/*": ["./src/routes/*"]
+      "@routes/*": ["./src/routes/*"],
+      "@hooks/*": ["./src/hooks/*"]
     },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

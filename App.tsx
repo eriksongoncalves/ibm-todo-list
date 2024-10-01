@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { Text } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import {
   useFonts,
@@ -8,6 +7,7 @@ import {
 } from '@expo-google-fonts/roboto'
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SignIn } from '@screens/Signin'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -30,7 +30,7 @@ export default function App() {
   return (
     <GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1 }}>
       <StatusBar style="light" backgroundColor="transparent" translucent />
-      <Text>Hello World</Text>
+      <SignIn />
     </GestureHandlerRootView>
   )
 }
