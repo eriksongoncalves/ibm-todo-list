@@ -1,4 +1,4 @@
-import { Alert, Image, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { Alert, Image } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
 
 import appLogoIcon from '@assets/images/app-logo-icon.png'
@@ -30,85 +30,85 @@ export function SignIn() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <S.Wrapper>
-        <S.ContentWrapper>
-          <S.LogoWrapper>
-            <Image
-              source={appLogoIcon}
-              style={{ width: 80, height: 80 }}
-              resizeMode="contain"
-            />
-            <Text fontFamily="robotoBold" size={20} color="white" mt={16}>
-              TODO-LIST
-            </Text>
-          </S.LogoWrapper>
+    // <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <S.Wrapper>
+      <S.ContentWrapper>
+        <S.LogoWrapper>
+          <Image
+            source={appLogoIcon}
+            style={{ width: 80, height: 80 }}
+            resizeMode="contain"
+          />
+          <Text fontFamily="robotoBold" size={20} color="white" mt={16}>
+            TODO-LIST
+          </Text>
+        </S.LogoWrapper>
 
-          <S.FormWrapper>
-            <Text
-              mb={16}
-              align="center"
-              fontFamily="robotoBold"
-              size={18}
-              color="white"
-            >
-              Acesse sua conta
-            </Text>
-
-            <Controller
-              name="email"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  {...register('email')}
-                  placeholder="E-mail"
-                  keyboardType="email-address"
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.email?.message}
-                  mb={16}
-                />
-              )}
-            />
-
-            <Controller
-              name="password"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  {...register('password')}
-                  placeholder="Senha"
-                  secureTextEntry
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors.password?.message}
-                  returnKeyLabel="Acessar"
-                  onSubmitEditing={handleSubmit(onSubmit)}
-                  mb={16}
-                />
-              )}
-            />
-
-            <Button onPress={handleSubmit(onSubmit)} disabled={false}>
-              <Text fontFamily="robotoBold" color="white">
-                Acessar
-              </Text>
-            </Button>
-          </S.FormWrapper>
-        </S.ContentWrapper>
-
-        <S.BottomWrapper>
-          <Text fontFamily="robotoRegular" color="white" mb={12} align="center">
-            Ainda não tem acesso?
+        <S.FormWrapper>
+          <Text
+            mb={16}
+            align="center"
+            fontFamily="robotoBold"
+            size={18}
+            color="white"
+          >
+            Acesse sua conta
           </Text>
 
-          <Button variant="outline" onPress={() => {}} disabled={false}>
-            <Text fontFamily="robotoBold" color="green_500">
-              Criar conta
+          <Controller
+            name="email"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                {...register('email')}
+                placeholder="E-mail"
+                keyboardType="email-address"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.email?.message}
+                mb={16}
+              />
+            )}
+          />
+
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                {...register('password')}
+                placeholder="Senha"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+                returnKeyLabel="Acessar"
+                onSubmitEditing={handleSubmit(onSubmit)}
+                mb={16}
+              />
+            )}
+          />
+
+          <Button onPress={handleSubmit(onSubmit)} disabled={false}>
+            <Text fontFamily="robotoBold" color="white">
+              Acessar
             </Text>
           </Button>
-        </S.BottomWrapper>
-      </S.Wrapper>
-    </TouchableWithoutFeedback>
+        </S.FormWrapper>
+      </S.ContentWrapper>
+
+      <S.BottomWrapper>
+        <Text fontFamily="robotoRegular" color="white" mb={12} align="center">
+          Ainda não tem acesso?
+        </Text>
+
+        <Button variant="outline" onPress={() => {}} disabled={false}>
+          <Text fontFamily="robotoBold" color="green_500">
+            Criar conta
+          </Text>
+        </Button>
+      </S.BottomWrapper>
+    </S.Wrapper>
+    // </TouchableWithoutFeedback>
   )
 }

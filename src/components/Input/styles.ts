@@ -1,5 +1,6 @@
 import styled, { css, DefaultTheme } from 'styled-components/native'
 import { TextInput as Input } from 'react-native'
+
 import { Spacing } from '@shared/theme'
 
 const variants = {

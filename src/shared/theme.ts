@@ -3,7 +3,7 @@ export const theme = {
     family: {
       roboto: {
         regular: 'Roboto_400Regular',
-        bold: 'Roboto_400Bold'
+        bold: 'Roboto_700Bold'
       }
     },
     size: {
