@@ -1,15 +1,20 @@
 import { Alert, Image, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
+import { useNavigation } from '@react-navigation/native'
 
 import appLogoIcon from '@assets/images/app-logo-icon.png'
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
 import { Text } from '@components/Text'
+import { useAuth } from '@hooks/auth'
 
 import * as S from './styles'
 import { SignUpFormData, signUpFormResolver } from './validationSchema'
 
 export function SignUp() {
+  const navigation = useNavigation()
+  const { signUp, loading } = useAuth()
+
   const {
     register,
     handleSubmit,
@@ -21,9 +26,13 @@ export function SignUp() {
     reValidateMode: 'onChange'
   })
 
+  function handleNavigateToSignIn() {
+    navigation.goBack()
+  }
+
   async function onSubmit(data: any) {
     try {
-      console.log('>>> data', data)
+      await signUp(data)
     } catch {
       Alert.alert('Ocorreu um erro ao salvar os dados')
     }
@@ -119,7 +128,7 @@ export function SignUp() {
               )}
             />
 
-            <Button onPress={handleSubmit(onSubmit)} disabled={false}>
+            <Button onPress={handleSubmit(onSubmit)} disabled={loading}>
               <Text fontFamily="robotoBold" color="white">
                 Salvar e acessar
               </Text>
@@ -128,7 +137,11 @@ export function SignUp() {
         </S.ContentWrapper>
 
         <S.BottomWrapper>
-          <Button variant="outline" onPress={() => {}} disabled={false}>
+          <Button
+            variant="outline"
+            onPress={handleNavigateToSignIn}
+            disabled={loading}
+          >
             <Text fontFamily="robotoBold" color="green_500">
               Voltar para o login
             </Text>

@@ -7,9 +7,11 @@ import {
 } from '@expo-google-fonts/roboto'
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { SignUp } from '@screens/Signup'
 import { ThemeProvider } from 'styled-components/native'
+
+import { Routes } from '@src/routes'
 import { theme } from '@shared/theme'
+import { AuthProvider } from '@hooks/auth'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -33,7 +35,9 @@ export default function App() {
     <GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1 }}>
       <ThemeProvider theme={theme}>
         <StatusBar style="light" backgroundColor="transparent" translucent />
-        <SignUp />
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   )
