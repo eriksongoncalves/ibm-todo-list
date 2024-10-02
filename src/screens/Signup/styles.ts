@@ -4,7 +4,7 @@ import {
   getBottomSpace
 } from 'react-native-iphone-x-helper'
 
-export const Wrapper = styled.View`
+export const Wrapper = styled.ScrollView`
   ${({ theme }) => css`
     flex: 1;
     width: 100%;
@@ -16,7 +16,6 @@ export const Wrapper = styled.View`
 export const ContentWrapper = styled.View`
   ${({ theme }) => css`
     width: 100%;
-    height: 72%;
     border-bottom-left-radius: 32px;
     border-bottom-right-radius: 32px;
     background-color: ${theme.colors.gray_700};
@@ -41,5 +40,6 @@ export const BottomWrapper = styled.View`
   width: 100%;
   padding-left: 32px;
   padding-right: 32px;
-  padding-top: 50px;
+  padding-top: 30px;
+  margin-bottom: 40px;
 `

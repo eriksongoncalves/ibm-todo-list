@@ -7,7 +7,7 @@ import {
 } from '@expo-google-fonts/roboto'
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { SignIn } from '@screens/Signin'
+import { SignUp } from '@screens/Signup'
 import { ThemeProvider } from 'styled-components/native'
 import { theme } from '@shared/theme'
 
@@ -33,7 +33,7 @@ export default function App() {
     <GestureHandlerRootView onLayout={onLayoutRootView} style={{ flex: 1 }}>
       <ThemeProvider theme={theme}>
         <StatusBar style="light" backgroundColor="transparent" translucent />
-        <SignIn />
+        <SignUp />
       </ThemeProvider>
     </GestureHandlerRootView>
   )
