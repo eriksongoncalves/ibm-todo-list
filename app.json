@@ -21,6 +21,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121214"
       },
+      "softwareKeyboardLayoutMode": "pan",
       "package": "com.eriksongoncalves.todolist"
     },
     "web": {

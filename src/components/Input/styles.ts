@@ -34,8 +34,8 @@ export const TextInput = styled(Input)<TextInputProps>`
     font-size: ${theme.fonts.size[16]};
     color: ${theme.colors.gray_200};
 
-    margin-top: ${mt ? `${mt}px` : 'auto'};
-    margin-bottom: ${mb ? `${mb}px` : 'auto'};
+    margin-top: ${mt ? `${mt}px` : 'initial'};
+    margin-bottom: ${mb ? `${mb}px` : 'initial'};
 
     ${hasError && variants.error(theme)};
     ${isActive && variants.active(theme)};

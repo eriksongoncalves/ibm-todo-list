@@ -31,7 +31,7 @@ export const ButtonWrapper = styled(TouchableOpacity)<ContainerProps>`
     border-radius: 8px;
     padding: 16px;
     ${variants[variant](theme)}
-    margin-top: ${mt ? `${mt}px` : 'auto'};
-    margin-bottom: ${mb ? `${mb}px` : 'auto'};
+    margin-top: ${mt ? `${mt}px` : 'initial'};
+    margin-bottom: ${mb ? `${mb}px` : 'initial'};
   `}
 `

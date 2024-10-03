@@ -39,7 +39,7 @@ export const theme = {
   }
 } as const
 
-export type Spacing = 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 24
+export type Spacing = 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 24 | 28
 
 enum FontFamilies {
   'robotoRegular' = 'robotoRegular',

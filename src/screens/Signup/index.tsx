@@ -40,7 +40,7 @@ export function SignUp() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <S.Wrapper>
+      <S.Wrapper bounces={false}>
         <S.ContentWrapper>
           <S.LogoWrapper>
             <Image

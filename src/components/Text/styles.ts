@@ -16,6 +16,7 @@ type WrapperProps = {
   trasnform?: 'none' | 'uppercase' | 'lowercase'
   mt?: Spacing
   mb?: Spacing
+  ml?: Spacing
 }
 
 const modifiers = {
@@ -25,14 +26,15 @@ const modifiers = {
 }
 
 export const Wrapper = styled.Text<WrapperProps>`
-  ${({ theme, size, fontFamily, color, align, trasnform, mt, mb }) => css`
+  ${({ theme, size, fontFamily, color, align, trasnform, mt, mb, ml }) => css`
     font-size: ${theme.fonts.size[size]};
     font-family: ${modifiers.fontFamily(fontFamily)};
     color: ${theme.colors[color]};
     line-height: ${modifiers.lineHeight(size, theme)};
     text-align: ${align};
     text-transform: ${trasnform};
-    margin-top: ${mt ? `${mt}px` : 'auto'};
-    margin-bottom: ${mb ? `${mb}px` : 'auto'};
+    margin-top: ${mt ? `${mt}px` : 'initial'};
+    margin-bottom: ${mb ? `${mb}px` : 'initial'};
+    margin-left: ${ml ? `${ml}px` : 'initial'};
   `}
 `

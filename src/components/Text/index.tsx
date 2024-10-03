@@ -16,6 +16,7 @@ type TextProps = {
   trasnform?: 'none' | 'uppercase' | 'lowercase'
   mt?: Spacing
   mb?: Spacing
+  ml?: Spacing
 } & TextPropsBase
 
 export function Text({

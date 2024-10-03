@@ -22,6 +22,7 @@ export const ContentWrapper = styled.View`
     padding-top: ${getStatusBarHeight()}px;
     padding-left: 32px;
     padding-right: 32px;
+    padding-bottom: 8px;
   `}
 `
 

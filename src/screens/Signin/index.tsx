@@ -16,7 +16,6 @@ export function SignIn() {
   const { signIn, loading } = useAuth()
 
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors }
@@ -40,7 +39,7 @@ export function SignIn() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <S.Wrapper>
+      <S.Wrapper bounces={false}>
         <S.ContentWrapper>
           <S.LogoWrapper>
             <Image
@@ -69,7 +68,6 @@ export function SignIn() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  {...register('email')}
                   placeholder="E-mail"
                   keyboardType="email-address"
                   onChangeText={onChange}
@@ -85,7 +83,6 @@ export function SignIn() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  {...register('password')}
                   placeholder="Senha"
                   secureTextEntry
                   onChangeText={onChange}
