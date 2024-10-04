@@ -36,6 +36,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           hasError={!!errorMessage}
           autoCorrect={false}
           autoCapitalize="none"
+          autoComplete="off"
           editable={!disabled}
           onFocus={handleInputFocus}
           onBlur={e => {

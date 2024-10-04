@@ -16,7 +16,6 @@ export function SignUp() {
   const { signUp, loading } = useAuth()
 
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors }
@@ -69,7 +68,6 @@ export function SignUp() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  {...register('name')}
                   placeholder="Nome"
                   keyboardType="ascii-capable"
                   onChangeText={onChange}
@@ -85,7 +83,6 @@ export function SignUp() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  {...register('email')}
                   placeholder="E-mail"
                   keyboardType="email-address"
                   onChangeText={onChange}
@@ -101,7 +98,6 @@ export function SignUp() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  {...register('password')}
                   placeholder="Senha"
                   secureTextEntry
                   onChangeText={onChange}
@@ -117,7 +113,6 @@ export function SignUp() {
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Input
-                  {...register('confirm_password')}
                   placeholder="Confirmar senha"
                   secureTextEntry
                   onChangeText={onChange}
