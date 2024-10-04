@@ -1,5 +1,7 @@
+import { useCallback } from 'react'
 import { Keyboard, TouchableWithoutFeedback } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
+import { useFocusEffect } from '@react-navigation/native'
 
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
@@ -15,20 +17,28 @@ export function Profile() {
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors }
   } = useForm<ProfileFormData>({
     resolver: profileFormDataResolver,
     mode: 'all',
-    reValidateMode: 'onChange',
-    defaultValues: {
-      name: user?.name,
-      email: user?.email
-    }
+    reValidateMode: 'onChange'
   })
 
   function onSubmit(data: ProfileFormData) {
     console.log('>>> DATA', data)
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      reset({
+        name: user?.name,
+        email: user?.email,
+        password: '',
+        confirm_password: ''
+      })
+    }, [])
+  )
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
