@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1075360432109",
+    "project_id": "ibm-todolist",
+    "storage_bucket": "ibm-todolist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075360432109:android:df54a656d9475612a0f1e4",
+        "android_client_info": {
+          "package_name": "com.eriksongoncalves.todolist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVSv7XkNIpDfBU-QfO3mc9JBlpy5YA9uM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

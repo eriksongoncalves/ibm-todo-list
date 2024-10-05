@@ -9,7 +9,6 @@ export type User = {
   id: string
   name: string
   email: string
-  imageUri?: string
 }
 
 export type SignUpInput = Omit<User, 'id'> & {

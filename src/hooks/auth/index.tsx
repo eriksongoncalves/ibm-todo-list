@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import auth from '@react-native-firebase/auth'
 
 import * as types from './types'
 
@@ -9,25 +10,6 @@ const AuthContext = createContext<types.AuthContextProps>(
   {} as types.AuthContextProps
 )
 
-const fakeAuthPromise = (credentials: types.SignInCredentials) => {
-  return new Promise<types.User>((resolve, reject) => {
-    setTimeout(() => {
-      if (
-        credentials.email === 'teste@teste.com.br' &&
-        credentials.password === '123456'
-      ) {
-        resolve({
-          id: 'fakeId',
-          name: 'Erikson',
-          email: 'teste@teste.com.br'
-        })
-      } else {
-        reject()
-      }
-    }, 1000)
-  })
-}
-
 const AuthProvider = ({ children }: types.AuthProviderProps) => {
   const [user, setUser] = useState<types.User>()
   const [loading, setLoading] = useState(true)
@@ -36,14 +18,16 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
     try {
       setLoading(true)
 
-      const user = await fakeAuthPromise({
-        email: credentials.email,
-        password: credentials.password
-      })
+      const { user } = await auth().signInWithEmailAndPassword(
+        credentials.email,
+        credentials.password
+      )
 
-      await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user))
+      console.log('>>> auth', user)
 
-      setUser(user)
+      // await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(userData));
+
+      // setUser(userData);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('>>> signIn error', error)

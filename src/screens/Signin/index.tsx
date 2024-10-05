@@ -95,7 +95,7 @@ export function SignIn() {
               )}
             />
 
-            <Button onPress={handleSubmit(onSubmit)} disabled={loading}>
+            <Button onPress={handleSubmit(onSubmit)} loading={loading}>
               <Text fontFamily="robotoBold" color="white">
                 Acessar
               </Text>

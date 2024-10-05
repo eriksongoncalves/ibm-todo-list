@@ -7,7 +7,7 @@ import {
 } from '@expo-google-fonts/roboto'
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { ThemeProvider } from 'styled-components/native'
+import { ThemeProvider } from 'styled-components'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 
 import { Routes } from '@src/routes'
