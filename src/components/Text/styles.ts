@@ -33,8 +33,17 @@ export const Wrapper = styled.Text<WrapperProps>`
     line-height: ${modifiers.lineHeight(size, theme)};
     text-align: ${align};
     text-transform: ${trasnform};
-    margin-top: ${mt ? `${mt}px` : 'initial'};
-    margin-bottom: ${mb ? `${mb}px` : 'initial'};
-    margin-left: ${ml ? `${ml}px` : 'initial'};
+    ${mt &&
+    css`
+      margin-top: ${mt}px;
+    `};
+    ${mb &&
+    css`
+      margin-bottom: ${mb}px;
+    `};
+    ${ml &&
+    css`
+      margin-bottom: ${ml}px;
+    `};
   `}
 `
