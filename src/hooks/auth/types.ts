@@ -15,10 +15,8 @@ export type SignUpInput = Omit<User, 'id'> & {
   password: string
 }
 
-export type UpdateProfileInput = Omit<User, 'imageUri'> & {
-  old_password: string
-  new_password: string
-  image?: FormData
+export type UpdateProfileInput = Omit<User, 'id'> & {
+  password?: string
 }
 
 export type AuthContextProps = {

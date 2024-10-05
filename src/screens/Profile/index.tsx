@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { Keyboard, TouchableWithoutFeedback, Alert } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
 import { useFocusEffect } from '@react-navigation/native'
 
@@ -18,6 +18,7 @@ export function Profile() {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors }
   } = useForm<ProfileFormData>({
     resolver: profileFormDataResolver,
@@ -25,8 +26,21 @@ export function Profile() {
     reValidateMode: 'onChange'
   })
 
-  function onSubmit(data: ProfileFormData) {
-    console.log('>>> DATA', data)
+  async function onSubmit(data: ProfileFormData) {
+    try {
+      await updateProfile({
+        name: data.name,
+        email: data.email,
+        password: data.password
+      })
+
+      setValue('password', '')
+      setValue('confirm_password', '')
+
+      Alert.alert('\\o/', 'Dados salvos com sucesso!')
+    } catch (error: any) {
+      Alert.alert('Opss', error.message)
+    }
   }
 
   useFocusEffect(
@@ -37,7 +51,7 @@ export function Profile() {
         password: '',
         confirm_password: ''
       })
-    }, [])
+    }, [user])
   )
 
   return (
@@ -110,7 +124,7 @@ export function Profile() {
             )}
           />
 
-          <Button onPress={handleSubmit(onSubmit)} disabled={loading}>
+          <Button onPress={handleSubmit(onSubmit)} loading={loading}>
             <Text fontFamily="robotoBold" color="white">
               Salvar
             </Text>

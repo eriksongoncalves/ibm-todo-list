@@ -32,8 +32,8 @@ export function SignIn() {
   async function onSubmit(data: SignInFormData) {
     try {
       await signIn(data)
-    } catch {
-      Alert.alert('Login ou senha inválidos')
+    } catch (error: any) {
+      Alert.alert('Opss', error.message)
     }
   }
 

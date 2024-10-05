@@ -22,7 +22,13 @@ export function SignUp() {
   } = useForm<SignUpFormData>({
     resolver: signUpFormResolver,
     mode: 'all',
-    reValidateMode: 'onChange'
+    reValidateMode: 'onChange',
+    defaultValues: {
+      name: 'Erikson',
+      email: 'teste@teste.com.br',
+      password: '123456',
+      confirm_password: '123456'
+    }
   })
 
   function handleNavigateToSignIn() {
@@ -32,8 +38,12 @@ export function SignUp() {
   async function onSubmit(data: any) {
     try {
       await signUp(data)
-    } catch {
-      Alert.alert('Ocorreu um erro ao salvar os dados')
+
+      Alert.alert('\\o/', 'Conta criada com sucesso!')
+
+      handleNavigateToSignIn()
+    } catch (err: any) {
+      Alert.alert('Opss', err?.message)
     }
   }
 
@@ -123,7 +133,7 @@ export function SignUp() {
               )}
             />
 
-            <Button onPress={handleSubmit(onSubmit)} disabled={loading}>
+            <Button onPress={handleSubmit(onSubmit)} loading={loading}>
               <Text fontFamily="robotoBold" color="white">
                 Salvar e acessar
               </Text>
