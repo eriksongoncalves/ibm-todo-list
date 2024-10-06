@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect, useState } from 'react'
+import { useRef, useMemo, useEffect, useState, useCallback } from 'react'
 import { Alert, FlatList } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import { useForm, Controller } from 'react-hook-form'
@@ -10,39 +10,29 @@ import {
   Entypo,
   FontAwesome
 } from '@expo/vector-icons'
+import firestore from '@react-native-firebase/firestore'
 
 import { ProgressBar } from '@components/ProgressBar'
 import { Text } from '@components/Text'
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { BottomModalWrapper } from '@components/BottomModalWrapper'
+import { useAuth } from '@hooks/auth'
 
 import * as S from './styles'
 import { ListFormData, listFormResolver } from './validationSchema'
+import { ListData } from '@shared/types/dtos/Lists'
 
-const listsMock = [
-  {
-    id: '1',
-    name: 'Lista 1',
-    done: 16,
-    total: 16
-  },
-  {
-    id: '2',
-    name: 'Lista 2',
-    done: 28,
-    total: 36
-  }
-]
-
-type ListData = {
-  id?: string
-  name: string
+type ListDataProps = ListData & {
+  id: string
+  done: number
+  total: number
 }
 
 export function MyLists() {
   const navigation = useNavigation()
   const theme = useTheme()
+  const { user } = useAuth()
   const formBottomSheetRef = useRef<BottomSheetModal>(null)
   const listMenuBottomSheetRef = useRef<BottomSheetModal>(null)
   const {
@@ -55,13 +45,72 @@ export function MyLists() {
     mode: 'all',
     reValidateMode: 'onChange'
   })
-  const [listData, setListData] = useState<ListData>()
+  const [listSelected, setListSelected] = useState<ListData>()
+  const [listData, setListData] = useState<ListDataProps[]>([])
+  const [loading, setLoading] = useState(false)
 
   const formSnapPoints = useMemo(() => [290], [])
   const listMenuSnapPoints = useMemo(() => [270], [])
 
-  function onSaveList(data: ListFormData) {
-    console.log('>>> data', data)
+  async function onSaveList(data: ListFormData) {
+    try {
+      setLoading(true)
+      const dateUpdatedOrCreated = new Date()
+      const firestoreDateUpdatedOrCreated =
+        firestore.Timestamp.fromDate(dateUpdatedOrCreated)
+
+      if (listSelected) {
+        await firestore().collection('lists').doc(listSelected.id).update({
+          name: data.name,
+          updated_at: firestoreDateUpdatedOrCreated
+        })
+
+        setListData(prevState =>
+          prevState.map(item => ({
+            ...item,
+            ...(item.id === listSelected.id
+              ? { name: data.name, updated_at: dateUpdatedOrCreated }
+              : {})
+          }))
+        )
+
+        Alert.alert('\\o/', 'Lista atualizada com sucesso!')
+      } else {
+        const newItem = {
+          name: data.name,
+          user_id: user!.id,
+          items: []
+        }
+
+        const doc = await firestore()
+          .collection('lists')
+          .add({
+            ...newItem,
+            created_at: firestoreDateUpdatedOrCreated,
+            updated_at: firestoreDateUpdatedOrCreated
+          })
+
+        const newState = [
+          ...listData,
+          {
+            id: doc.id,
+            ...newItem,
+            created_at: dateUpdatedOrCreated,
+            updated_at: dateUpdatedOrCreated,
+            done: 0,
+            total: 0
+          }
+        ]
+
+        setListData(newState)
+
+        Alert.alert('\\o/', 'Lista inserida com sucesso!')
+      }
+    } catch (e) {
+      console.log('>>> onSaveList error', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleCloseListMenuModal() {
@@ -71,23 +120,25 @@ export function MyLists() {
   function handleCloseFormModal() {
     formBottomSheetRef.current?.dismiss()
     reset({ name: '' })
-    setListData(undefined)
+    setListSelected(undefined)
   }
 
   function handleOpenListMenu(data: ListData) {
-    setListData(data)
+    setListSelected(data)
     listMenuBottomSheetRef?.current?.present()
   }
 
   function handleAddNewList() {
+    if (loading) return
+
     reset({ name: '' })
-    setListData(undefined)
+    setListSelected(undefined)
     formBottomSheetRef.current?.present()
   }
 
   function handleEditList() {
     listMenuBottomSheetRef.current?.dismiss()
-    reset({ name: listData!.name })
+    reset({ name: listSelected!.name })
     formBottomSheetRef.current?.present()
   }
 
@@ -95,17 +146,35 @@ export function MyLists() {
     navigation.navigate('list_detail', { listId })
   }
 
-  function handleDeleteList() {
-    if (listData) {
+  async function handleDeleteList() {
+    try {
+      setLoading(true)
+      await firestore().collection('lists').doc(listSelected?.id).delete()
+
+      setListData(prevState =>
+        prevState.filter(item => item.id !== listSelected?.id)
+      )
+
+      Alert.alert('\\o/', 'Lista deletada com sucesso!')
+      handleCloseListMenuModal()
+    } catch (e) {
+      console.log('>>> handleDeleteList Error', e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleConfirmDeleteList() {
+    if (listSelected) {
       Alert.alert(
         'Confirmação',
-        `Deseja realmente remover "${listData.name}"?`,
+        `Deseja realmente remover "${listSelected.name}"?`,
         [
           {
             text: 'Cancelar',
             style: 'cancel'
           },
-          { text: 'Confirmar', onPress: () => console.log('Confirm Pressed') }
+          { text: 'Confirmar', onPress: handleDeleteList }
         ]
       )
     }
@@ -125,76 +194,105 @@ export function MyLists() {
     })
   }, [navigation])
 
-  if (listsMock.length <= 0) {
-    return (
-      <S.Wrapper>
-        <S.EmptyWrapper>
-          <MaterialIcons
-            name="filter-list-off"
-            size={90}
-            color={theme.colors.gray_500}
-          />
+  useEffect(() => {
+    const unsuscribe = firestore()
+      .collection('lists')
+      .where('user_id', '==', user?.id)
+      .orderBy('created_at', 'asc')
+      .onSnapshot(response => {
+        if (response) {
+          const listFormatted = response.docs.map(doc => {
+            const data = doc.data()
 
-          <Text align="center" size={20} color="gray_300">
-            Você ainda não tem nenhuma lista cadastrada ainda!
-          </Text>
-          <Button variant="ghost" onPress={handleAddNewList}>
-            <Text fontFamily="robotoBold" color="green_500" size={20}>
-              Criar lista
-            </Text>
-          </Button>
-        </S.EmptyWrapper>
-      </S.Wrapper>
-    )
-  }
+            const createdAt = new Date(data.created_at.toDate())
+            const updatedAt = new Date(data.updated_at.toDate())
+
+            return {
+              id: doc.id,
+              ...data,
+              created_at: createdAt,
+              updated_at: updatedAt,
+              done: 0,
+              total: 0
+            } as ListDataProps
+          })
+
+          setListData(listFormatted)
+        }
+
+        return () => unsuscribe()
+      })
+  }, [])
 
   return (
     <S.Wrapper>
-      <S.ListWrapper>
-        <FlatList
-          bounces={false}
-          showsVerticalScrollIndicator={false}
-          data={listsMock}
-          keyExtractor={item => String(item.id)}
-          renderItem={({ item }) => (
-            <Button
-              variant="ghost"
-              onPress={() => handleNavigateToList(item.id)}
-            >
-              <S.Item>
-                <S.TitleWrapper>
-                  <Text fontFamily="robotoBold" size={20} mb={4}>
-                    {item.name}
-                  </Text>
+      {listData.length <= 0 ? (
+        <S.Wrapper>
+          <S.EmptyWrapper>
+            <MaterialIcons
+              name="filter-list-off"
+              size={90}
+              color={theme.colors.gray_500}
+            />
 
-                  <Button
-                    variant="ghost"
-                    onPress={() => handleOpenListMenu(item)}
-                  >
-                    <Entypo
-                      name="dots-three-vertical"
-                      size={24}
-                      color={theme.colors.gray_200}
-                    />
-                  </Button>
-                </S.TitleWrapper>
-
-                <ProgressBar
-                  itemsCount={item.done}
-                  itemsTotal={item.total}
-                  showItemsText
-                />
-              </S.Item>
+            <Text align="center" size={20} color="gray_300">
+              Você ainda não tem nenhuma lista cadastrada ainda!
+            </Text>
+            <Button variant="ghost" onPress={handleAddNewList}>
+              <Text fontFamily="robotoBold" color="green_500" size={20}>
+                Criar lista
+              </Text>
             </Button>
-          )}
-        />
-      </S.ListWrapper>
+          </S.EmptyWrapper>
+        </S.Wrapper>
+      ) : (
+        <S.ListWrapper>
+          <FlatList
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            data={listData}
+            keyExtractor={item => String(item.id)}
+            renderItem={({ item }) => (
+              <Button
+                variant="ghost"
+                onPress={() => handleNavigateToList(item.id)}
+                disabled={loading}
+              >
+                <S.Item>
+                  <S.TitleWrapper>
+                    <Text fontFamily="robotoBold" size={20} mb={4}>
+                      {item.name}
+                    </Text>
+
+                    <Button
+                      variant="ghost"
+                      onPress={() => handleOpenListMenu(item)}
+                    >
+                      <Entypo
+                        name="dots-three-vertical"
+                        size={24}
+                        color={theme.colors.gray_200}
+                      />
+                    </Button>
+                  </S.TitleWrapper>
+
+                  <ProgressBar
+                    itemsCount={item.done}
+                    itemsTotal={item.total}
+                    showItemsText
+                  />
+                </S.Item>
+              </Button>
+            )}
+          />
+        </S.ListWrapper>
+      )}
 
       {/* FORM */}
       <BottomModalWrapper
         ref={formBottomSheetRef}
         snapPoints={formSnapPoints}
-        title={`${listData?.id ? 'Editar lista' : 'Criar uma nova lista'}`}
+        title={`${listSelected ? 'Editar lista' : 'Criar uma nova lista'}`}
         onClose={handleCloseFormModal}
         onDismiss={handleCloseFormModal}
         hasForm
@@ -213,7 +311,7 @@ export function MyLists() {
           )}
         />
 
-        <Button onPress={handleSubmit(onSaveList)}>
+        <Button onPress={handleSubmit(onSaveList)} loading={loading}>
           <Text fontFamily="robotoBold">SALVAR</Text>
         </Button>
       </BottomModalWrapper>
@@ -223,7 +321,7 @@ export function MyLists() {
       <BottomModalWrapper
         ref={listMenuBottomSheetRef}
         snapPoints={listMenuSnapPoints}
-        title={listData?.name || ''}
+        title={listSelected?.name || ''}
         onClose={handleCloseListMenuModal}
         onDismiss={handleCloseListMenuModal}
       >
@@ -238,7 +336,7 @@ export function MyLists() {
           </Text>
         </S.MenuItem>
 
-        <S.MenuItem variant="ghost" mt={28} onPress={handleDeleteList}>
+        <S.MenuItem variant="ghost" mt={28} onPress={handleConfirmDeleteList}>
           <FontAwesome name="trash-o" size={22} color={theme.colors.red_600} />
           <Text fontFamily="robotoBold" color="red_600" ml={10}>
             Deletar
