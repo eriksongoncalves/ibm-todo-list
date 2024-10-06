@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect, useState, useCallback } from 'react'
+import { useRef, useMemo, useEffect, useState } from 'react'
 import { Alert, FlatList } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import { useForm, Controller } from 'react-hook-form'
@@ -11,6 +11,7 @@ import {
   FontAwesome
 } from '@expo/vector-icons'
 import firestore from '@react-native-firebase/firestore'
+import Toast from 'react-native-toast-message'
 
 import { ProgressBar } from '@components/ProgressBar'
 import { Text } from '@components/Text'
@@ -74,7 +75,12 @@ export function MyLists() {
           }))
         )
 
-        Alert.alert('\\o/', 'Lista atualizada com sucesso!')
+        Toast.show({
+          visibilityTime: 2000,
+          type: 'success',
+          text1: '\\o/',
+          text2: 'Lista atualizada com sucesso!'
+        })
       } else {
         const newItem = {
           name: data.name,
@@ -104,9 +110,20 @@ export function MyLists() {
 
         setListData(newState)
 
-        Alert.alert('\\o/', 'Lista inserida com sucesso!')
+        Toast.show({
+          visibilityTime: 2000,
+          type: 'success',
+          text1: '\\o/',
+          text2: 'Lista inserida com sucesso!'
+        })
       }
     } catch (e) {
+      Toast.show({
+        visibilityTime: 2000,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Ocorreu um erro ao salvar os dados'
+      })
       console.log('>>> onSaveList error', e)
     } finally {
       setLoading(false)
@@ -155,9 +172,21 @@ export function MyLists() {
         prevState.filter(item => item.id !== listSelected?.id)
       )
 
-      Alert.alert('\\o/', 'Lista deletada com sucesso!')
+      Toast.show({
+        visibilityTime: 2000,
+        type: 'success',
+        text1: '\\o/',
+        text2: 'Lista deletada com sucesso!'
+      })
+
       handleCloseListMenuModal()
     } catch (e) {
+      Toast.show({
+        visibilityTime: 2000,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Ocorreu um erro ao deletar a lista'
+      })
       console.log('>>> handleDeleteList Error', e)
     } finally {
       setLoading(false)
@@ -343,6 +372,7 @@ export function MyLists() {
           </Text>
         </S.MenuItem>
       </BottomModalWrapper>
+      <Toast />
     </S.Wrapper>
   )
 }

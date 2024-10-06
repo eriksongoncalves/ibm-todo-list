@@ -1,6 +1,7 @@
-import { Alert, Image, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { Image, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigation } from '@react-navigation/native'
+import Toast from 'react-native-toast-message'
 
 import appLogoIcon from '@assets/images/app-logo-icon.png'
 import { Input } from '@components/Input'
@@ -33,7 +34,12 @@ export function SignIn() {
     try {
       await signIn(data)
     } catch (error: any) {
-      Alert.alert('Opss', error.message)
+      Toast.show({
+        visibilityTime: 2000,
+        type: 'error',
+        text1: 'Opss...',
+        text2: error.message
+      })
     }
   }
 
@@ -118,6 +124,7 @@ export function SignIn() {
             </Text>
           </Button>
         </S.BottomWrapper>
+        <Toast />
       </S.Wrapper>
     </TouchableWithoutFeedback>
   )

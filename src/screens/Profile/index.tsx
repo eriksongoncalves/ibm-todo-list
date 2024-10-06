@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
-import { Keyboard, TouchableWithoutFeedback, Alert } from 'react-native'
+import { Keyboard, TouchableWithoutFeedback } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
 import { useFocusEffect } from '@react-navigation/native'
+import Toast from 'react-native-toast-message'
 
 import { Input } from '@components/Input'
 import { Button } from '@components/Button'
@@ -37,9 +38,19 @@ export function Profile() {
       setValue('password', '')
       setValue('confirm_password', '')
 
-      Alert.alert('\\o/', 'Dados salvos com sucesso!')
+      Toast.show({
+        visibilityTime: 2000,
+        type: 'success',
+        text1: '\\o/',
+        text2: 'Dados salvos com sucesso!'
+      })
     } catch (error: any) {
-      Alert.alert('Opss', error.message)
+      Toast.show({
+        visibilityTime: 2000,
+        type: 'error',
+        text1: 'Opss...',
+        text2: error.message
+      })
     }
   }
 
@@ -130,6 +141,7 @@ export function Profile() {
             </Text>
           </Button>
         </S.Content>
+        <Toast />
       </S.Wrapper>
     </TouchableWithoutFeedback>
   )
