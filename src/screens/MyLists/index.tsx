@@ -38,7 +38,6 @@ export function MyLists() {
   const { user } = useAuth()
   const formBottomSheetRef = useRef<BottomSheetModal>(null)
   const listMenuBottomSheetRef = useRef<BottomSheetModal>(null)
-  const closeFormButtonRef = useRef(null)
   const {
     control,
     handleSubmit,
@@ -54,6 +53,7 @@ export function MyLists() {
   const [loading, setLoading] = useState(true)
   const [formLoading, setFormLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [forceEnableDismiss, setForceEnableDismiss] = useState(false)
 
   const formSnapPoints = useMemo(() => [290], [])
   const listMenuSnapPoints = useMemo(() => [270], [])
@@ -81,7 +81,7 @@ export function MyLists() {
         )
 
         Toast.show({
-          visibilityTime: 3000,
+          visibilityTime: 1500,
           topOffset: 0,
           type: 'success',
           text1: '\\o/',
@@ -117,7 +117,7 @@ export function MyLists() {
         setListData(newState)
 
         Toast.show({
-          visibilityTime: 3000,
+          visibilityTime: 1500,
           topOffset: 0,
           type: 'success',
           text1: '\\o/',
@@ -144,6 +144,7 @@ export function MyLists() {
   }
 
   function handleCloseFormModal() {
+    setForceEnableDismiss(true)
     formBottomSheetRef.current?.dismiss()
     reset({ name: '' })
     setListSelected(undefined)
@@ -155,12 +156,14 @@ export function MyLists() {
   }
 
   function handleAddNewList() {
+    setForceEnableDismiss(false)
     reset({ name: '' })
     setListSelected(undefined)
     formBottomSheetRef.current?.present()
   }
 
   function handleEditList() {
+    setForceEnableDismiss(false)
     listMenuBottomSheetRef.current?.dismiss()
     reset({ name: listSelected!.name })
     formBottomSheetRef.current?.present()
@@ -178,14 +181,6 @@ export function MyLists() {
       setListData(prevState =>
         prevState.filter(item => item.id !== listSelected?.id)
       )
-
-      Toast.show({
-        visibilityTime: 2000,
-        topOffset: 0,
-        type: 'success',
-        text1: '\\o/',
-        text2: 'Lista deletada com sucesso!'
-      })
 
       handleCloseListMenuModal()
     } catch (e) {
@@ -343,7 +338,7 @@ export function MyLists() {
         title={`${listSelected ? 'Editar lista' : 'Criar uma nova lista'}`}
         onClose={handleCloseFormModal}
         onDismiss={handleCloseFormModal}
-        forceEnableDismiss={true}
+        forceEnableDismiss={forceEnableDismiss}
       >
         <Controller
           name="name"
