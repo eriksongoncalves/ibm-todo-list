@@ -140,7 +140,7 @@ export function SignUp() {
 
             <Button onPress={handleSubmit(onSubmit)} loading={loading}>
               <Text fontFamily="robotoBold" color="white">
-                Salvar e acessar
+                Salvar
               </Text>
             </Button>
           </S.FormWrapper>
