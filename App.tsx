@@ -20,10 +20,7 @@ SplashScreen.preventAutoHideAsync()
 
 Sentry.init({
   dsn: SENTRY_DSN,
-  tracesSampleRate: 1.0,
-  _experiments: {
-    profilesSampleRate: 1.0
-  }
+  debug: true
 })
 
 function App() {
