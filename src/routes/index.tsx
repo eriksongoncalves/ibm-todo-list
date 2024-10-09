@@ -4,13 +4,20 @@ import { useAuth } from '@hooks/auth'
 
 import { AppTabRoutes } from './app.tab.routes'
 import { AuthStackRoutes } from './auth.stack.routes'
+import { LoadingScreen } from '@src/components/LoadingScreen'
 
 export function Routes() {
-  const { user } = useAuth()
+  const { user, isInitialLoading } = useAuth()
 
   return (
     <NavigationContainer>
-      {user?.id ? <AppTabRoutes /> : <AuthStackRoutes />}
+      {isInitialLoading ? (
+        <LoadingScreen />
+      ) : user?.id ? (
+        <AppTabRoutes />
+      ) : (
+        <AuthStackRoutes />
+      )}
     </NavigationContainer>
   )
 }

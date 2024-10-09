@@ -43,7 +43,7 @@ export const Wrapper = styled.Text<WrapperProps>`
     `};
     ${ml &&
     css`
-      margin-bottom: ${ml}px;
+      margin-left: ${ml}px;
     `};
   `}
 `

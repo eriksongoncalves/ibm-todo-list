@@ -1,9 +1,10 @@
-export type ListItemStatus = 'pending' | 'in_progress' | 'done' | 'cancelled'
+export type ListItemStatus = 'pending' | 'in_progress' | 'done'
 
 export type ListItemData = {
-  id?: string
+  id: string
+  description: string
   status: ListItemStatus
-  comment?: string
+  comments?: string
   created_at: Date
   updated_at: Date
 }

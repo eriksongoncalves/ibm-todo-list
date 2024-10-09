@@ -3,8 +3,9 @@ export declare global {
     interface RootParamList {
       signin: undefined
       signup: undefined
-      list_detail: {
+      list_item: {
         listId: string
+        name: string
       }
     }
   }

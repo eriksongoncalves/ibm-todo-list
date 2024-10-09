@@ -1,8 +1,8 @@
-import { useRef, useMemo, useEffect, useState } from 'react'
+import { useRef, useMemo, useEffect, useState, useCallback } from 'react'
 import { Alert, FlatList } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import { useForm, Controller } from 'react-hook-form'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import {
   MaterialIcons,
@@ -18,11 +18,13 @@ import { Text } from '@components/Text'
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { BottomModalWrapper } from '@components/BottomModalWrapper'
+import { Empty } from '@components/Empty'
+import { LoadingScreen } from '@components/LoadingScreen'
 import { useAuth } from '@hooks/auth'
 
 import * as S from './styles'
 import { ListFormData, listFormResolver } from './validationSchema'
-import { ListData } from '@shared/types/dtos/Lists'
+import { ListData, ListItemData } from '@shared/types/dtos/Lists'
 
 type ListDataProps = ListData & {
   id: string
@@ -36,6 +38,7 @@ export function MyLists() {
   const { user } = useAuth()
   const formBottomSheetRef = useRef<BottomSheetModal>(null)
   const listMenuBottomSheetRef = useRef<BottomSheetModal>(null)
+  const closeFormButtonRef = useRef(null)
   const {
     control,
     handleSubmit,
@@ -48,14 +51,16 @@ export function MyLists() {
   })
   const [listSelected, setListSelected] = useState<ListData>()
   const [listData, setListData] = useState<ListDataProps[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [formLoading, setFormLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const formSnapPoints = useMemo(() => [290], [])
   const listMenuSnapPoints = useMemo(() => [270], [])
 
   async function onSaveList(data: ListFormData) {
     try {
-      setLoading(true)
+      setFormLoading(true)
       const dateUpdatedOrCreated = new Date()
       const firestoreDateUpdatedOrCreated =
         firestore.Timestamp.fromDate(dateUpdatedOrCreated)
@@ -76,7 +81,8 @@ export function MyLists() {
         )
 
         Toast.show({
-          visibilityTime: 2000,
+          visibilityTime: 3000,
+          topOffset: 0,
           type: 'success',
           text1: '\\o/',
           text2: 'Lista atualizada com sucesso!'
@@ -111,7 +117,8 @@ export function MyLists() {
         setListData(newState)
 
         Toast.show({
-          visibilityTime: 2000,
+          visibilityTime: 3000,
+          topOffset: 0,
           type: 'success',
           text1: '\\o/',
           text2: 'Lista inserida com sucesso!'
@@ -120,13 +127,15 @@ export function MyLists() {
     } catch (e) {
       Toast.show({
         visibilityTime: 2000,
+        topOffset: 0,
         type: 'error',
         text1: 'Opss...',
         text2: 'Ocorreu um erro ao salvar os dados'
       })
       console.log('>>> onSaveList error', e)
     } finally {
-      setLoading(false)
+      setFormLoading(false)
+      handleCloseFormModal()
     }
   }
 
@@ -146,8 +155,6 @@ export function MyLists() {
   }
 
   function handleAddNewList() {
-    if (loading) return
-
     reset({ name: '' })
     setListSelected(undefined)
     formBottomSheetRef.current?.present()
@@ -159,13 +166,13 @@ export function MyLists() {
     formBottomSheetRef.current?.present()
   }
 
-  function handleNavigateToList(listId: string) {
-    navigation.navigate('list_detail', { listId })
+  function handleNavigateToList(data: ListData) {
+    navigation.navigate('list_item', { listId: data.id!, name: data.name })
   }
 
   async function handleDeleteList() {
     try {
-      setLoading(true)
+      setDeleteLoading(true)
       await firestore().collection('lists').doc(listSelected?.id).delete()
 
       setListData(prevState =>
@@ -174,6 +181,7 @@ export function MyLists() {
 
       Toast.show({
         visibilityTime: 2000,
+        topOffset: 0,
         type: 'success',
         text1: '\\o/',
         text2: 'Lista deletada com sucesso!'
@@ -189,7 +197,7 @@ export function MyLists() {
       })
       console.log('>>> handleDeleteList Error', e)
     } finally {
-      setLoading(false)
+      setDeleteLoading(false)
     }
   }
 
@@ -223,57 +231,67 @@ export function MyLists() {
     })
   }, [navigation])
 
-  useEffect(() => {
-    const unsuscribe = firestore()
-      .collection('lists')
-      .where('user_id', '==', user?.id)
-      .orderBy('created_at', 'asc')
-      .onSnapshot(response => {
-        if (response) {
-          const listFormatted = response.docs.map(doc => {
-            const data = doc.data()
+  useFocusEffect(
+    useCallback(() => {
+      try {
+        setLoading(true)
 
-            const createdAt = new Date(data.created_at.toDate())
-            const updatedAt = new Date(data.updated_at.toDate())
+        const unsubscribe = firestore()
+          .collection('lists')
+          .where('user_id', '==', user?.id)
+          .orderBy('created_at', 'asc')
+          .onSnapshot(response => {
+            if (response) {
+              const listFormatted = response.docs.map(doc => {
+                const data = doc.data()
 
-            return {
-              id: doc.id,
-              ...data,
-              created_at: createdAt,
-              updated_at: updatedAt,
-              done: 0,
-              total: 0
-            } as ListDataProps
+                const createdAt = new Date(data.created_at.toDate())
+                const updatedAt = new Date(data.updated_at.toDate())
+
+                const items = data.items as ListItemData[]
+
+                const done = items.filter(item => item.status === 'done').length
+                const total = items.length
+
+                return {
+                  id: doc.id,
+                  ...data,
+                  created_at: createdAt,
+                  updated_at: updatedAt,
+                  done,
+                  total
+                } as ListDataProps
+              })
+
+              setListData(listFormatted)
+              setLoading(false)
+            }
+
+            return () => unsubscribe()
           })
-
-          setListData(listFormatted)
-        }
-
-        return () => unsuscribe()
-      })
-  }, [])
+      } catch {
+        setLoading(false)
+        Toast.show({
+          visibilityTime: 4000,
+          type: 'error',
+          text1: 'Opss...',
+          text2:
+            'Ocorreu um erro ao carregar os dados, tente novamente mais tarde.'
+        })
+      }
+    }, [navigation, user?.id])
+  )
 
   return (
     <S.Wrapper>
-      {listData.length <= 0 ? (
-        <S.Wrapper>
-          <S.EmptyWrapper>
-            <MaterialIcons
-              name="filter-list-off"
-              size={90}
-              color={theme.colors.gray_500}
-            />
-
-            <Text align="center" size={20} color="gray_300">
-              Você ainda não tem nenhuma lista cadastrada ainda!
-            </Text>
-            <Button variant="ghost" onPress={handleAddNewList}>
-              <Text fontFamily="robotoBold" color="green_500" size={20}>
-                Criar lista
-              </Text>
-            </Button>
-          </S.EmptyWrapper>
-        </S.Wrapper>
+      {loading ? (
+        <LoadingScreen />
+      ) : listData.length <= 0 ? (
+        <Empty
+          description="Você ainda não tem nenhuma lista cadastrada ainda!"
+          actionDescription="Criar lista"
+          onPress={handleAddNewList}
+        />
       ) : (
         <S.ListWrapper>
           <FlatList
@@ -284,7 +302,7 @@ export function MyLists() {
             renderItem={({ item }) => (
               <Button
                 variant="ghost"
-                onPress={() => handleNavigateToList(item.id)}
+                onPress={() => handleNavigateToList(item)}
                 disabled={loading}
               >
                 <S.Item>
@@ -324,7 +342,7 @@ export function MyLists() {
         title={`${listSelected ? 'Editar lista' : 'Criar uma nova lista'}`}
         onClose={handleCloseFormModal}
         onDismiss={handleCloseFormModal}
-        hasForm
+        forceEnableDismiss={true}
       >
         <Controller
           name="name"
@@ -340,7 +358,7 @@ export function MyLists() {
           )}
         />
 
-        <Button onPress={handleSubmit(onSaveList)} loading={loading}>
+        <Button onPress={handleSubmit(onSaveList)} loading={formLoading}>
           <Text fontFamily="robotoBold">SALVAR</Text>
         </Button>
       </BottomModalWrapper>
@@ -354,7 +372,12 @@ export function MyLists() {
         onClose={handleCloseListMenuModal}
         onDismiss={handleCloseListMenuModal}
       >
-        <S.MenuItem variant="ghost" mt={18} onPress={handleEditList}>
+        <S.MenuItem
+          variant="ghost"
+          mt={18}
+          onPress={handleEditList}
+          disabled={deleteLoading}
+        >
           <MaterialCommunityIcons
             name="playlist-edit"
             size={28}
@@ -365,10 +388,15 @@ export function MyLists() {
           </Text>
         </S.MenuItem>
 
-        <S.MenuItem variant="ghost" mt={28} onPress={handleConfirmDeleteList}>
+        <S.MenuItem
+          variant="ghost"
+          mt={28}
+          onPress={handleConfirmDeleteList}
+          disabled={deleteLoading}
+        >
           <FontAwesome name="trash-o" size={22} color={theme.colors.red_600} />
           <Text fontFamily="robotoBold" color="red_600" ml={10}>
-            Deletar
+            {deleteLoading ? 'Deletando...' : 'Deletar'}
           </Text>
         </S.MenuItem>
       </BottomModalWrapper>

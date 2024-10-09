@@ -20,13 +20,13 @@ const variants = {
 
 type ContainerProps = {
   variant: ButtonVariant
-  loading?: boolean
   mt?: Spacing
   mb?: Spacing
+  ml?: Spacing
 }
 
 export const ButtonWrapper = styled(TouchableOpacity)<ContainerProps>`
-  ${({ theme, variant, loading, mt, mb }) => css`
+  ${({ theme, variant, mt, mb, ml }) => css`
     width: 100%;
     align-items: center;
     border-radius: 8px;
@@ -39,6 +39,10 @@ export const ButtonWrapper = styled(TouchableOpacity)<ContainerProps>`
     ${mb &&
     css`
       margin-bottom: ${mb}px;
+    `};
+    ${ml &&
+    css`
+      margin-left: ${ml}px;
     `};
   `}
 `

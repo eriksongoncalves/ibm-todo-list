@@ -1,21 +1,34 @@
 import { useMemo } from 'react'
 import { Platform } from 'react-native'
 import { useTheme } from 'styled-components/native'
+import { TabActions } from '@react-navigation/native'
 import {
   BottomTabNavigationOptions,
   createBottomTabNavigator
 } from '@react-navigation/bottom-tabs'
-import { FontAwesome5, FontAwesome6, MaterialIcons } from '@expo/vector-icons'
+import {
+  FontAwesome5,
+  FontAwesome6,
+  MaterialIcons,
+  Ionicons
+} from '@expo/vector-icons'
 
 import { Profile } from '@screens/Profile'
 import { MyLists } from '@screens/MyLists'
+import { ListItem } from '@screens/ListItem'
 import { useAuth } from '@hooks/auth'
+import { Button } from '@components/Button'
+import { Text } from '@components/Text'
 
 export type BottomTabParamListBase = {
   my_lists_tab: undefined
-  list_detail: undefined
+  list_item: undefined
   profile_tab: undefined
   logout_tab: undefined
+}
+
+type ListItemsRouteParams = {
+  name?: string
 }
 
 const { Navigator, Screen } = createBottomTabNavigator<BottomTabParamListBase>()
@@ -108,11 +121,44 @@ export function AppTabRoutes() {
       />
 
       <Screen
-        name="list_detail"
-        component={Profile}
-        options={{
-          ...tabWithHeaderOptions,
-          tabBarButton: () => null
+        name="list_item"
+        component={ListItem}
+        options={({ route, navigation }) => {
+          const name = route?.params
+            ? (route.params! as ListItemsRouteParams)?.name
+            : ''
+
+          return {
+            ...tabWithHeaderOptions,
+            headerLeft: () => (
+              <Button
+                variant="ghost"
+                onPress={() => {
+                  const jumpToAction = TabActions.jumpTo('my_lists_tab')
+                  navigation.dispatch(jumpToAction)
+                }}
+                ml={16}
+              >
+                <Ionicons
+                  name="arrow-back-sharp"
+                  size={24}
+                  color={theme.colors.green_500}
+                />
+              </Button>
+            ),
+            headerTitle: () => (
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                color="white"
+                fontFamily="robotoBold"
+                size={22}
+              >
+                {name}
+              </Text>
+            ),
+            tabBarButton: () => null
+          }
         }}
       />
     </Navigator>

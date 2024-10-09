@@ -38,6 +38,7 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-toast-message": "^2.2.1",
+    "react-native-uuid": "^2.0.2",
     "styled-components": "^5.3.9"
   },
   "devDependencies": {

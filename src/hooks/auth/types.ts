@@ -22,6 +22,7 @@ export type UpdateProfileInput = Omit<User, 'id'> & {
 export type AuthContextProps = {
   user: User | undefined
   loading: boolean
+  isInitialLoading: boolean
   signIn(credentials: SignInCredentials): Promise<void>
   signOut(): Promise<void>
   signUp(data: SignUpInput): Promise<void>

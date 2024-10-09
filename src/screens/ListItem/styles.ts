@@ -9,6 +9,16 @@ export const Wrapper = styled.View`
   `}
 `
 
+export const HeaderIconButton = styled(Button)`
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin-right: 16px;
+`
+
 export const ListWrapper = styled.View`
   margin-top: 32px;
   padding-left: 16px;
@@ -26,24 +36,27 @@ export const Item = styled.View`
 
 export const TitleWrapper = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 16px;
-`
-
-export const HeaderIconButton = styled(Button)`
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  justify-content: center;
   align-items: center;
-  padding: 0;
-  margin-right: 16px;
+  gap: 8px;
 `
 
-export const MenuItem = styled(Button)`
+export const StatusWrapper = styled.View`
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
-  padding: 0;
-  gap: 16px;
+  gap: 8px;
+`
+
+export const StatusButton = styled(Button)<{ isActive?: boolean }>`
+  ${({ theme, isActive }) => css`
+    background-color: ${theme.colors.gray_600};
+    width: auto;
+    border: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    ${isActive &&
+    css`
+      background-color: ${theme.colors.green_500};
+    `};
+  `}
 `

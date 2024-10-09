@@ -11,6 +11,7 @@ const AuthContext = createContext<types.AuthContextProps>(
 const AuthProvider = ({ children }: types.AuthProviderProps) => {
   const [user, setUser] = useState<types.User>()
   const [loading, setLoading] = useState(true)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
 
   const updateUserDataFromCurrentUserFirebase = () => {
     const currentUser = auth().currentUser
@@ -139,6 +140,7 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
 
         updateUserDataFromCurrentUserFirebase()
       } finally {
+        setIsInitialLoading(false)
         setLoading(false)
       }
     }
@@ -151,6 +153,7 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
       value={{
         user,
         loading,
+        isInitialLoading,
         signIn,
         signOut,
         signUp,

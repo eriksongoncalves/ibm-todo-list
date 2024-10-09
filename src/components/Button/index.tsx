@@ -12,6 +12,7 @@ type ButtonProps = {
   disabled?: boolean
   mt?: Spacing
   mb?: Spacing
+  ml?: Spacing
 } & TouchableOpacityProps
 
 export function Button({
@@ -21,6 +22,7 @@ export function Button({
   disabled,
   mb,
   mt,
+  ml,
   ...rest
 }: ButtonProps) {
   const theme = useTheme()
@@ -32,6 +34,7 @@ export function Button({
       disabled={disabled || loading}
       mb={mb}
       mt={mt}
+      ml={ml}
       {...rest}
     >
       {loading ? <ActivityIndicator color={theme.colors.white} /> : children}

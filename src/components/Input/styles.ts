@@ -33,6 +33,7 @@ export const TextInput = styled(Input)<TextInputProps>`
     font-family: ${theme.fonts.family.roboto.regular};
     font-size: ${theme.fonts.size[16]};
     color: ${theme.colors.gray_200};
+    vertical-align: top;
 
     ${mt &&
     css`
