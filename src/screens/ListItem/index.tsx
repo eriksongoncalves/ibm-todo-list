@@ -1,13 +1,24 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import { FlatList, BackHandler, Alert, Platform } from 'react-native'
-import { TabActions, useNavigation, useRoute } from '@react-navigation/native'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { FlatList, BackHandler, Alert } from 'react-native'
+import {
+  TabActions,
+  useNavigation,
+  useRoute,
+  useFocusEffect
+} from '@react-navigation/native'
 import { useTheme } from 'styled-components/native'
 import firestore from '@react-native-firebase/firestore'
-import { MaterialIcons, AntDesign, FontAwesome } from '@expo/vector-icons'
+import {
+  MaterialIcons,
+  AntDesign,
+  FontAwesome,
+  Ionicons
+} from '@expo/vector-icons'
 import Toast from 'react-native-toast-message'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { useForm, Controller } from 'react-hook-form'
 import uuid from 'react-native-uuid'
+import { Dropdown, IDropdownRef } from 'react-native-element-dropdown'
 
 import * as S from './styles'
 import { ItemFormData, itemFormResolver } from './validationSchema'
@@ -25,6 +36,13 @@ type RouteParams = {
   listId: string
 }
 
+const filterStatusData = [
+  { label: 'Todos', value: '' },
+  { label: 'Pendentes', value: 'pending' },
+  { label: 'Em andamento', value: 'in_progress' },
+  { label: 'Concluídas', value: 'done' }
+]
+
 export function ListItem() {
   const theme = useTheme()
   const navigation = useNavigation()
@@ -36,8 +54,11 @@ export function ListItem() {
   const [formDeleteLoading, setFormDeleteLoading] = useState(false)
   const [itemSelected, setItemSelected] = useState<ListItemData>()
   const [listData, setListData] = useState<ListData>()
+  const [statusFilterSelected, setStatusFilterSelected] = useState<string>()
 
   const formBottomSheetRef = useRef<BottomSheetModal>(null)
+  const ref = useRef<IDropdownRef>(null)
+
   const formSnapPoints = useMemo(
     () => [itemSelected ? '77%' : '74%'],
     [itemSelected]
@@ -244,6 +265,23 @@ export function ListItem() {
 
   useEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <Button
+          variant="ghost"
+          onPress={() => {
+            const jumpToAction = TabActions.jumpTo('my_lists_tab')
+            setLoading(true)
+            navigation.dispatch(jumpToAction)
+          }}
+          ml={16}
+        >
+          <Ionicons
+            name="arrow-back-sharp"
+            size={24}
+            color={theme.colors.green_500}
+          />
+        </Button>
+      ),
       headerRight: () => (
         <S.HeaderIconButton onPress={handleOpenFormModal}>
           <MaterialIcons
@@ -266,71 +304,82 @@ export function ListItem() {
       })
   }, [navigation, theme])
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        const jumpToAction = TabActions.jumpTo('my_lists_tab')
-        navigation.dispatch(jumpToAction)
-        return true
-      }
-    )
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true)
 
-    firestore()
-      .collection('lists')
-      .doc(listId)
-      .get()
-      .then(response => {
-        const listData = response.data() as ListData & {
-          created_at: any
-          updated_at: any
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          setLoading(true)
+          const jumpToAction = TabActions.jumpTo('my_lists_tab')
+          navigation.dispatch(jumpToAction)
+          return true
         }
+      )
 
-        if (listData) {
-          const itemsFormatted = listData?.items.map((item: any) => {
-            return {
-              ...item,
-              created_at: new Date(item.created_at.toDate()),
-              updated_at: new Date(item.updated_at.toDate())
-            }
-          })
+      firestore()
+        .collection('lists')
+        .doc(listId)
+        .get()
+        .then(response => {
+          const listData = response.data() as ListData & {
+            created_at: any
+            updated_at: any
+          }
 
-          setListData({
-            id: response.id,
-            ...listData,
-            items: itemsFormatted,
-            created_at: new Date(listData.created_at.toDate()),
-            updated_at: new Date(listData.updated_at.toDate())
-          })
+          if (listData) {
+            const itemsFormatted = listData?.items.map((item: any) => {
+              return {
+                ...item,
+                created_at: new Date(item.created_at.toDate()),
+                updated_at: new Date(item.updated_at.toDate())
+              }
+            })
+
+            setListData({
+              id: response.id,
+              ...listData,
+              items: itemsFormatted,
+              created_at: new Date(listData.created_at.toDate()),
+              updated_at: new Date(listData.updated_at.toDate())
+            })
+            setLoading(false)
+          }
+        })
+        .catch(e => {
           setLoading(false)
-        }
-      })
-      .catch(e => {
-        setLoading(false)
 
-        Toast.show({
-          visibilityTime: 2000,
-          type: 'error',
-          text1: 'Opss...',
-          text2: 'Ocorreu um erro ao carregar os itens da lista'
+          Toast.show({
+            visibilityTime: 2000,
+            type: 'error',
+            text1: 'Opss...',
+            text2: 'Ocorreu um erro ao carregar os itens da lista'
+          })
+
+          const jumpToAction = TabActions.jumpTo('my_lists_tab')
+          navigation.dispatch(jumpToAction)
         })
 
-        const jumpToAction = TabActions.jumpTo('my_lists_tab')
-        navigation.dispatch(jumpToAction)
-      })
-
-    return () => backHandler.remove()
-  }, [])
+      return () => backHandler.remove()
+    }, [navigation, listId])
+  )
 
   const listItems = useMemo(() => {
-    return listData?.items || []
-  }, [listData?.items])
+    const items = listData?.items || []
+
+    if (statusFilterSelected) {
+      return items.filter(item => item.status === statusFilterSelected)
+    }
+
+    return items
+  }, [listData?.items, statusFilterSelected])
 
   return (
     <S.Wrapper>
       {loading ? (
         <LoadingScreen />
-      ) : listItems.length <= 0 ? (
+      ) : listItems.length <= 0 && statusFilterSelected === undefined ? (
         <Empty
           description="Você ainda não tem nenhum item adicionado na sua lista!"
           actionDescription="Adicionar um item"
@@ -338,6 +387,59 @@ export function ListItem() {
         />
       ) : (
         <S.ListWrapper>
+          <S.Filter>
+            <Text
+              fontFamily="robotoBold"
+              color="white"
+              style={{ width: 'auto' }}
+            >
+              Filtrar por:
+            </Text>
+
+            <S.Select>
+              <Dropdown
+                ref={ref}
+                data={filterStatusData}
+                style={{
+                  borderRadius: 5,
+                  backgroundColor: theme.colors.gray_600,
+                  padding: 8
+                  // marginLeft: 'auto'
+                }}
+                containerStyle={{
+                  top: -20,
+                  backgroundColor: theme.colors.gray_600,
+                  borderColor: theme.colors.gray_300
+                }}
+                fontFamily={theme.fonts.family.roboto.regular}
+                activeColor={theme.colors.gray_500}
+                itemTextStyle={{
+                  color: theme.colors.gray_300,
+                  fontFamily: theme.fonts.family.roboto.regular
+                }}
+                placeholderStyle={{
+                  color: theme.colors.gray_200,
+                  fontFamily: theme.fonts.family.roboto.regular
+                }}
+                selectedTextStyle={{
+                  color: theme.colors.gray_200,
+                  fontFamily: theme.fonts.family.roboto.regular
+                }}
+                dropdownPosition="bottom"
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder="Todos"
+                value={statusFilterSelected}
+                closeModalWhenSelectedItem={false}
+                onChange={item => {
+                  setStatusFilterSelected(item.value)
+                  ref.current?.close()
+                }}
+              />
+            </S.Select>
+          </S.Filter>
+
           <FlatList
             bounces={false}
             showsVerticalScrollIndicator={false}

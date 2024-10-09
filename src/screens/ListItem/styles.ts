@@ -60,3 +60,15 @@ export const StatusButton = styled(Button)<{ isActive?: boolean }>`
     `};
   `}
 `
+
+export const Filter = styled.View`
+  margin-bottom: 24px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`
+
+export const Select = styled.View`
+  width: 170px;
+  margin-left: auto;
+`
