@@ -12,6 +12,7 @@
 - React Native
 - React Navigation
 - Prettier
+- Sentry
 - Styled Components
 - Typescript
 - Zod
@@ -28,7 +29,9 @@
 
 <br />
 
-Na raiz do projeto instale as dependências:
+Duplique e renomeie o arquivo `.env.example` para `.env`
+
+Pelo terminal na raiz do projeto instale as dependências:
 
 ```
 npm install
