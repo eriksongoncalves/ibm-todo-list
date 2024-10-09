@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { FlatList, BackHandler, Alert } from 'react-native'
+import { FlatList, BackHandler, Alert, Platform } from 'react-native'
 import { TabActions, useNavigation, useRoute } from '@react-navigation/native'
 import { useTheme } from 'styled-components/native'
 import firestore from '@react-native-firebase/firestore'
@@ -449,7 +449,7 @@ export function ListItem() {
               numberOfLines={7}
               onChangeText={onChange}
               value={value}
-              errorMessage={errors.description?.message}
+              errorMessage={errors.comments?.message}
               mb={16}
             />
           )}

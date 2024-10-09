@@ -37,6 +37,8 @@ export const BottomModalWrapper = forwardRef<
       {...rest}
     >
       <BottomSheetScrollView
+        bounces={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           backgroundColor: theme.colors.gray_400,
           flexGrow: 1

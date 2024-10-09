@@ -264,11 +264,12 @@ export function MyLists() {
               })
 
               setListData(listFormatted)
-              setLoading(false)
             }
 
-            return () => unsubscribe()
+            setLoading(false)
           })
+
+        return () => unsubscribe()
       } catch {
         setLoading(false)
         Toast.show({

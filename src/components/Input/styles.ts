@@ -1,5 +1,5 @@
 import styled, { css, DefaultTheme } from 'styled-components/native'
-import { TextInput as Input } from 'react-native'
+import { TextInput as Input, Platform } from 'react-native'
 
 import { Spacing } from '@shared/theme'
 
@@ -21,10 +21,11 @@ type TextInputProps = {
   hasError: boolean
   mt?: Spacing
   mb?: Spacing
+  // numberOfLines?: number
 }
 
 export const TextInput = styled(Input)<TextInputProps>`
-  ${({ theme, isActive, hasError, isDisabled, mt, mb }) => css`
+  ${({ theme, isActive, hasError, isDisabled, mt, mb, numberOfLines }) => css`
     width: 100%;
     border-radius: 8px;
     border: 1px solid ${theme.colors.gray_600};
@@ -47,5 +48,10 @@ export const TextInput = styled(Input)<TextInputProps>`
     ${hasError && variants.error(theme)};
     ${isActive && variants.active(theme)};
     ${isDisabled && variants.disabled(theme)};
+    ${Platform.OS === 'ios' &&
+    numberOfLines &&
+    css`
+      height: ${numberOfLines * 18}px;
+    `}
   `}
 `

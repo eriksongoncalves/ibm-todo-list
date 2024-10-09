@@ -23,13 +23,7 @@ export function SignUp() {
   } = useForm<SignUpFormData>({
     resolver: signUpFormResolver,
     mode: 'all',
-    reValidateMode: 'onChange',
-    defaultValues: {
-      name: 'Erikson',
-      email: 'teste@teste.com.br',
-      password: '123456',
-      confirm_password: '123456'
-    }
+    reValidateMode: 'onChange'
   })
 
   function handleNavigateToSignIn() {

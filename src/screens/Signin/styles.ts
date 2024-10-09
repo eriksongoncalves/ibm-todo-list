@@ -19,7 +19,7 @@ export const ContentWrapper = styled.View`
     border-bottom-left-radius: 32px;
     border-bottom-right-radius: 32px;
     background-color: ${theme.colors.gray_700};
-    padding-top: ${getStatusBarHeight()}px;
+    padding-top: ${getStatusBarHeight() + 30}px;
     padding-left: 32px;
     padding-right: 32px;
     padding-bottom: 32px;
