@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { FlatList, BackHandler, Alert } from 'react-native'
+import { FlatList, BackHandler, Alert, Platform } from 'react-native'
 import {
   TabActions,
   useNavigation,
@@ -19,21 +19,29 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { useForm, Controller } from 'react-hook-form'
 import uuid from 'react-native-uuid'
 import { Dropdown, IDropdownRef } from 'react-native-element-dropdown'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GOOGLE_AI_API_KEY } from '@env'
 
 import * as S from './styles'
-import { ItemFormData, itemFormResolver } from './validationSchema'
+import {
+  ItemFormData,
+  itemFormResolver,
+  suggestionItemsSchema
+} from './validationSchema'
 
-import { ListData, ListItemData } from '@src/shared/types/dtos/Lists'
+import { ListData, ListItemData } from '@shared/types/dtos/Lists'
 import { Button } from '@components/Button'
 import { Text } from '@components/Text'
 import { Empty } from '@components/Empty'
 import { LoadingScreen } from '@components/LoadingScreen'
-import { Input } from '@components/Input'
+import { Input, SuggestionsList } from '@components/Input'
 import { BottomModalWrapper } from '@components/BottomModalWrapper'
 import { Radio } from '@components/Radio'
+import { useDebounce } from '@hooks/useDebounce'
 
 type RouteParams = {
   listId: string
+  name: string
 }
 
 const filterStatusData = [
@@ -47,7 +55,8 @@ export function ListItem() {
   const theme = useTheme()
   const navigation = useNavigation()
   const route = useRoute()
-  const { listId } = route.params as RouteParams
+  const { debounce } = useDebounce()
+  const { listId, name: listName } = route.params as RouteParams
 
   const [loading, setLoading] = useState(true)
   const [formLoading, setFormLoading] = useState(false)
@@ -55,6 +64,7 @@ export function ListItem() {
   const [itemSelected, setItemSelected] = useState<ListItemData>()
   const [listData, setListData] = useState<ListData>()
   const [statusFilterSelected, setStatusFilterSelected] = useState<string>()
+  const [suggestionsList, setSuggestionsList] = useState<SuggestionsList[]>([])
 
   const formBottomSheetRef = useRef<BottomSheetModal>(null)
   const ref = useRef<IDropdownRef>(null)
@@ -212,6 +222,7 @@ export function ListItem() {
     formBottomSheetRef.current?.dismiss()
     reset()
     setItemSelected(undefined)
+    clearSuggestionList()
   }
 
   async function handleDeleteItem() {
@@ -260,6 +271,58 @@ export function ListItem() {
         },
         { text: 'Confirmar', onPress: handleDeleteItem }
       ])
+    }
+  }
+
+  function clearSuggestionList() {
+    suggestionsList.length > 0 && setSuggestionsList([])
+  }
+
+  function getSuggestions(textInput: string) {
+    if (GOOGLE_AI_API_KEY) {
+      debounce(() => {
+        if (typeof textInput !== 'string' || textInput.trim().length < 3) {
+          clearSuggestionList()
+          return
+        }
+
+        const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY)
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+        model
+          .generateContent(
+            `Gere 5 items para um todolist chamado "${listName}" que comece com "${textInput}", o retorno deve ser um json contendo um array de objetos com o atributo item e seu valor`
+          )
+          .then(({ response }) => {
+            if (response && response?.candidates) {
+              const text = response.candidates[0]?.content.parts[0]?.text
+
+              if (text) {
+                const textFormatted = text
+                  .replace(/```\w*n/g, '')
+                  .replace(/\n```/g, '')
+                  .trim()
+                const textToJson = JSON.parse(textFormatted)
+
+                console.log('suggestions textToJson >>>', textToJson)
+
+                const { success, data } =
+                  suggestionItemsSchema.safeParse(textToJson)
+                const suggestions = success ? data : []
+
+                console.log('suggestions >>>', suggestions)
+                setSuggestionsList(suggestions)
+              } else {
+                clearSuggestionList()
+              }
+            } else {
+              clearSuggestionList()
+            }
+          })
+          .catch(() => {
+            clearSuggestionList()
+          })
+      }, 500)
     }
   }
 
@@ -362,7 +425,7 @@ export function ListItem() {
         })
 
       return () => backHandler.remove()
-    }, [navigation, listId])
+    }, [navigation, listId, listName])
   )
 
   const listItems = useMemo(() => {
@@ -407,7 +470,7 @@ export function ListItem() {
                   // marginLeft: 'auto'
                 }}
                 containerStyle={{
-                  top: -20,
+                  top: Platform.OS === 'ios' ? -20 : 2,
                   backgroundColor: theme.colors.gray_600,
                   borderColor: theme.colors.gray_300
                 }}
@@ -498,18 +561,25 @@ export function ListItem() {
           render={({ field: { onChange, value } }) => (
             <Input
               placeholder="Descrição"
-              onChangeText={onChange}
+              onChangeText={text => {
+                clearSuggestionList()
+                onChange(text)
+                getSuggestions(text)
+              }}
               value={value}
               errorMessage={errors.description?.message}
               mb={16}
+              suggestions={suggestionsList}
+              onSuggestionPress={item => {
+                onChange(item)
+                clearSuggestionList()
+              }}
             />
           )}
         />
-
         <Text fontFamily="robotoBold" color="white" mb={8} mt={22}>
           Status
         </Text>
-
         <Controller
           name="status"
           control={control}
@@ -537,7 +607,6 @@ export function ListItem() {
             </S.StatusWrapper>
           )}
         />
-
         <Text fontFamily="robotoBold" color="white" mb={8} mt={22}>
           Comentário
         </Text>
@@ -556,7 +625,6 @@ export function ListItem() {
             />
           )}
         />
-
         <Button
           onPress={handleSubmit(onSaveItem)}
           loading={formLoading}
@@ -564,7 +632,6 @@ export function ListItem() {
         >
           <Text color="white">Salvar</Text>
         </Button>
-
         {itemSelected && (
           <Button
             variant="ghost"

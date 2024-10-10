@@ -9,6 +9,12 @@ export const itemFormSchema = z.object({
   comments: z.string().optional().default('')
 })
 
+export const suggestionItemsSchema = z.array(
+  z.object({
+    item: z.string()
+  })
+)
+
 export type ItemFormData = z.infer<typeof itemFormSchema>
 
 export const itemFormResolver = zodResolver(itemFormSchema)

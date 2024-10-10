@@ -1,10 +1,14 @@
 import { useState, forwardRef } from 'react'
-import { TextInput, TextInputProps } from 'react-native'
+import { TextInput, TextInputProps, ScrollView, Keyboard } from 'react-native'
 import { useTheme } from 'styled-components/native'
 
 import * as S from './styles'
 import { Spacing } from '@shared/theme'
 import { Text } from '@components/Text'
+
+export type SuggestionsList = {
+  item: string
+}
 
 type InputProps = {
   style?: string
@@ -12,10 +16,24 @@ type InputProps = {
   errorMessage?: string
   mt?: Spacing
   mb?: Spacing
+  suggestions?: SuggestionsList[]
+  onSuggestionPress?: (item: string) => void
 } & TextInputProps
 
 export const Input = forwardRef<TextInput, InputProps>(
-  ({ errorMessage, disabled, onBlur, mt, mb, ...rest }, ref) => {
+  (
+    {
+      errorMessage,
+      disabled,
+      onBlur,
+      mt,
+      mb,
+      suggestions,
+      onSuggestionPress,
+      ...rest
+    },
+    ref
+  ) => {
     const [isFocused, setIsFocused] = useState(false)
     const theme = useTheme()
 
@@ -28,7 +46,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     }
 
     return (
-      <>
+      <S.Wrapper>
         <S.TextInput
           ref={ref}
           isActive={isFocused && !errorMessage}
@@ -60,7 +78,30 @@ export const Input = forwardRef<TextInput, InputProps>(
             {errorMessage}
           </Text>
         )}
-      </>
+
+        {suggestions && suggestions?.length > 0 && (
+          <S.SuggestionList
+            scrollEnabled
+            nestedScrollEnabled
+            onScrollBeginDrag={Keyboard.dismiss}
+            showsVerticalScrollIndicator
+            contentContainerStyle={{
+              paddingBottom: 30
+            }}
+          >
+            {suggestions.map(({ item }) => (
+              <S.SuggestionListItem
+                key={item}
+                onPress={() => {
+                  !!onSuggestionPress && onSuggestionPress(item)
+                }}
+              >
+                <Text color="white">{item}</Text>
+              </S.SuggestionListItem>
+            ))}
+          </S.SuggestionList>
+        )}
+      </S.Wrapper>
     )
   }
 )

@@ -1,3 +1,3 @@
 declare module '@env' {
-  export const SENTRY_DSN: string
+  export const GOOGLE_AI_API_KEY: string
 }

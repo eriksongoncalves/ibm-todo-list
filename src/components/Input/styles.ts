@@ -1,5 +1,5 @@
 import styled, { css, DefaultTheme } from 'styled-components/native'
-import { TextInput as Input, Platform } from 'react-native'
+import { TextInput as Input, Platform, TouchableOpacity } from 'react-native'
 
 import { Spacing } from '@shared/theme'
 
@@ -23,6 +23,10 @@ type TextInputProps = {
   mb?: Spacing
   // numberOfLines?: number
 }
+
+export const Wrapper = styled.View`
+  position: relative;
+`
 
 export const TextInput = styled(Input)<TextInputProps>`
   ${({ theme, isActive, hasError, isDisabled, mt, mb, numberOfLines }) => css`
@@ -53,5 +57,29 @@ export const TextInput = styled(Input)<TextInputProps>`
     css`
       height: ${numberOfLines * 18}px;
     `}
+  `}
+`
+
+export const SuggestionList = styled.ScrollView`
+  ${({ theme }) => css`
+    position: absolute;
+    top: 62px;
+    width: 100%;
+    background-color: ${theme.colors.gray_500};
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border: 1px solid ${theme.colors.gray_500};
+    max-height: 150px;
+    padding: 12px 16px;
+    z-index: 1;
+  `}
+`
+
+export const SuggestionListItem = styled(TouchableOpacity)`
+  ${({ theme }) => css`
+    width: 100%;
+    border-bottom: 2px solid ${theme.colors.white};
+    padding-top: 12px;
+    padding-bottom: 12px;
   `}
 `

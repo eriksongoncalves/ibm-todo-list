@@ -12,7 +12,6 @@
 - React Native
 - React Navigation
 - Prettier
-- Sentry
 - Styled Components
 - Typescript
 - Zod

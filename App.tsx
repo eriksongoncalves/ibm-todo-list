@@ -9,8 +9,6 @@ import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ThemeProvider } from 'styled-components'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import * as Sentry from '@sentry/react-native'
-import { SENTRY_DSN } from '@env'
 
 import { Routes } from '@src/routes'
 import { theme } from '@shared/theme'
@@ -18,12 +16,7 @@ import { AuthProvider } from '@hooks/auth'
 
 SplashScreen.preventAutoHideAsync()
 
-Sentry.init({
-  dsn: SENTRY_DSN,
-  debug: true
-})
-
-function App() {
+export default function App() {
   const [fontsLoaded, error] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold
@@ -52,5 +45,3 @@ function App() {
     </GestureHandlerRootView>
   )
 }
-
-export default Sentry.wrap(App)

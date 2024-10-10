@@ -27,6 +27,8 @@ export const BottomModalWrapper = forwardRef<
   return (
     <BottomSheetModal
       ref={ref}
+      enablePanDownToClose={false}
+      enableContentPanningGesture={false}
       containerStyle={{ backgroundColor: 'rgba(0,0,0,.7)' }}
       backgroundStyle={{ backgroundColor: theme.colors.gray_400 }}
       enableDismissOnClose={

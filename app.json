@@ -27,16 +27,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-font",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "todolist",
-          "organization": "erikson"
-        }
-      ]
-    ]
+    "plugins": ["expo-font"]
   }
 }
