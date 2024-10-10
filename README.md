@@ -38,6 +38,10 @@ npm install
 
 <br />
 
+Esse projeto utiliza Gemini para sugerir itens para a sua lista e para isso precisa gerar uma [Chave de API](https://aistudio.google.com/app/apikey) e adicionar ao arquivo `.env`
+
+<br />
+
 ## Iniciando a aplicação:
 
 ```
