@@ -1,8 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { ReactNativeFirebase } from '@react-native-firebase/app'
 import auth from '@react-native-firebase/auth'
+import { useNetInfo } from '@react-native-community/netinfo'
 
 import * as types from './types'
+
+class NoInternetError extends Error {
+  constructor() {
+    super('Parece que você está sem internet, conecte-se para continuar.')
+  }
+}
 
 const AuthContext = createContext<types.AuthContextProps>(
   {} as types.AuthContextProps
@@ -12,6 +19,13 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
   const [user, setUser] = useState<types.User>()
   const [loading, setLoading] = useState(true)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const netInfo = useNetInfo()
+
+  const verifyInternet = () => {
+    if (!netInfo.isConnected) {
+      throw new NoInternetError()
+    }
+  }
 
   const updateUserDataFromCurrentUserFirebase = () => {
     const currentUser = auth().currentUser
@@ -31,14 +45,21 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
     try {
       setLoading(true)
 
+      verifyInternet()
+
       await auth().signInWithEmailAndPassword(
         credentials.email,
         credentials.password
       )
 
       updateUserDataFromCurrentUserFirebase()
-    } catch {
-      throw new Error('Login ou senha inválidos')
+    } catch (error) {
+      const errorMessage =
+        error instanceof NoInternetError
+          ? error.message
+          : 'Login ou senha inválidos'
+
+      throw new Error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -47,6 +68,8 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
   const signUp = async (data: types.SignUpInput) => {
     try {
       setLoading(true)
+
+      verifyInternet()
 
       const { user } = await auth().createUserWithEmailAndPassword(
         data.email,
@@ -57,6 +80,10 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
         displayName: data.name
       })
     } catch (err) {
+      if (err instanceof NoInternetError) {
+        throw new Error(err.message)
+      }
+
       const error = err as ReactNativeFirebase.NativeFirebaseError
 
       if (error?.code === 'auth/email-already-in-use') {
@@ -78,7 +105,6 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
   const signOut = async () => {
     try {
       await auth().signOut()
-      // await AsyncStorage.removeItem(STORAGE_USER_KEY)
       setUser(undefined)
     } catch (error) {
       throw new Error('Ocorreu um erro ao tentar fazer logout')
@@ -89,9 +115,16 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
     try {
       setLoading(true)
 
+      verifyInternet()
+
       await auth().sendPasswordResetEmail(email)
     } catch (error) {
-      throw new Error('Ocorreu um erro ao tentar enviar o e-mail')
+      const errorMessage =
+        error instanceof NoInternetError
+          ? error.message
+          : 'Ocorreu um erro ao tentar enviar o e-mail'
+
+      throw new Error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -100,6 +133,8 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
   const updateProfile = async (data: types.UpdateProfileInput) => {
     try {
       setLoading(true)
+
+      verifyInternet()
 
       const currentUser = auth().currentUser
 
@@ -119,6 +154,10 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
 
       updateUserDataFromCurrentUserFirebase()
     } catch (err) {
+      if (err instanceof NoInternetError) {
+        throw new Error(err.message)
+      }
+
       const error = err as ReactNativeFirebase.NativeFirebaseError
 
       if (error?.code === 'auth/email-already-in-use') {

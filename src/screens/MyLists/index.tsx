@@ -12,6 +12,7 @@ import {
 } from '@expo/vector-icons'
 import firestore from '@react-native-firebase/firestore'
 import Toast from 'react-native-toast-message'
+import { useNetInfo } from '@react-native-community/netinfo'
 
 import { ProgressBar } from '@components/ProgressBar'
 import { Text } from '@components/Text'
@@ -19,6 +20,7 @@ import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { BottomModalWrapper } from '@components/BottomModalWrapper'
 import { Empty } from '@components/Empty'
+import { Disconnected } from '@components/Disconnected'
 import { LoadingScreen } from '@components/LoadingScreen'
 import { useAuth } from '@hooks/auth'
 
@@ -36,8 +38,8 @@ export function MyLists() {
   const navigation = useNavigation()
   const theme = useTheme()
   const { user } = useAuth()
-  const formBottomSheetRef = useRef<BottomSheetModal>(null)
-  const listMenuBottomSheetRef = useRef<BottomSheetModal>(null)
+  const netInfo = useNetInfo()
+
   const {
     control,
     handleSubmit,
@@ -48,6 +50,10 @@ export function MyLists() {
     mode: 'all',
     reValidateMode: 'onChange'
   })
+
+  const formBottomSheetRef = useRef<BottomSheetModal>(null)
+  const listMenuBottomSheetRef = useRef<BottomSheetModal>(null)
+
   const [listSelected, setListSelected] = useState<ListData>()
   const [listData, setListData] = useState<ListDataProps[]>([])
   const [loading, setLoading] = useState(true)
@@ -59,6 +65,18 @@ export function MyLists() {
   const listMenuSnapPoints = useMemo(() => [270], [])
 
   async function onSaveList(data: ListFormData) {
+    if (!netInfo.isConnected) {
+      Toast.show({
+        visibilityTime: 3000,
+        topOffset: 0,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Parece que você está sem internet, conecte-se para continuar.'
+      })
+
+      return
+    }
+
     try {
       setFormLoading(true)
       const dateUpdatedOrCreated = new Date()
@@ -170,6 +188,18 @@ export function MyLists() {
   }
 
   function handleNavigateToList(data: ListData) {
+    if (!netInfo.isConnected) {
+      Toast.show({
+        visibilityTime: 3000,
+        topOffset: 0,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Parece que você está sem internet, conecte-se para continuar.'
+      })
+
+      return
+    }
+
     navigation.navigate('list_item', { listId: data.id!, name: data.name })
   }
 
@@ -198,6 +228,18 @@ export function MyLists() {
 
   function handleConfirmDeleteList() {
     if (listSelected) {
+      if (!netInfo.isConnected) {
+        Toast.show({
+          visibilityTime: 3000,
+          topOffset: 0,
+          type: 'error',
+          text1: 'Opss...',
+          text2: 'Parece que você está sem internet, conecte-se para continuar.'
+        })
+
+        return
+      }
+
       Alert.alert(
         'Confirmação',
         `Deseja realmente remover "${listSelected.name}"?`,
@@ -275,12 +317,14 @@ export function MyLists() {
             'Ocorreu um erro ao carregar os dados, tente novamente mais tarde.'
         })
       }
-    }, [navigation, user?.id])
+    }, [navigation, user?.id, netInfo.isConnected])
   )
 
   return (
     <S.Wrapper>
-      {loading ? (
+      {!netInfo.isConnected ? (
+        <Disconnected />
+      ) : loading ? (
         <LoadingScreen />
       ) : listData.length <= 0 ? (
         <Empty

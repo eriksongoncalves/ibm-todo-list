@@ -1,10 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons'
+import { useTheme } from 'styled-components/native'
 
 import { Text } from '@components/Text'
 import { Button } from '@components/Button'
 
 import * as S from './styles'
-import { useTheme } from 'styled-components/native'
 
 type EmptyActions = {
   actionDescription: string

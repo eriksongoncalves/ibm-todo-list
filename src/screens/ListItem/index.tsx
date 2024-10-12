@@ -21,6 +21,7 @@ import uuid from 'react-native-uuid'
 import { Dropdown, IDropdownRef } from 'react-native-element-dropdown'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GOOGLE_AI_API_KEY } from '@env'
+import { useNetInfo } from '@react-native-community/netinfo'
 
 import * as S from './styles'
 import {
@@ -33,6 +34,7 @@ import { ListData, ListItemData } from '@shared/types/dtos/Lists'
 import { Button } from '@components/Button'
 import { Text } from '@components/Text'
 import { Empty } from '@components/Empty'
+import { Disconnected } from '@components/Disconnected'
 import { LoadingScreen } from '@components/LoadingScreen'
 import { Input, SuggestionsList } from '@components/Input'
 import { BottomModalWrapper } from '@components/BottomModalWrapper'
@@ -56,6 +58,8 @@ export function ListItem() {
   const navigation = useNavigation()
   const route = useRoute()
   const { debounce } = useDebounce()
+  const netInfo = useNetInfo()
+
   const { listId, name: listName } = route.params as RouteParams
 
   const [loading, setLoading] = useState(true)
@@ -86,6 +90,18 @@ export function ListItem() {
   })
 
   async function onSaveItem(data: ItemFormData) {
+    if (!netInfo.isConnected) {
+      Toast.show({
+        visibilityTime: 3000,
+        topOffset: 0,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Parece que você está sem internet, conecte-se para continuar.'
+      })
+
+      return
+    }
+
     try {
       setFormLoading(true)
       const dateUpdatedOrCreated = new Date()
@@ -150,6 +166,18 @@ export function ListItem() {
   }
 
   async function handleCompleteItem(data: ListItemData) {
+    if (!netInfo.isConnected) {
+      Toast.show({
+        visibilityTime: 3000,
+        topOffset: 0,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Parece que você está sem internet, conecte-se para continuar.'
+      })
+
+      return
+    }
+
     try {
       const dateUpdatedOrCreated = new Date()
 
@@ -264,6 +292,18 @@ export function ListItem() {
 
   function handleConfirmDeleteItem() {
     if (itemSelected) {
+      if (!netInfo.isConnected) {
+        Toast.show({
+          visibilityTime: 3000,
+          topOffset: 0,
+          type: 'error',
+          text1: 'Opss...',
+          text2: 'Parece que você está sem internet, conecte-se para continuar.'
+        })
+
+        return
+      }
+
       Alert.alert('Confirmação', `Deseja realmente remover este item?`, [
         {
           text: 'Cancelar',
@@ -279,7 +319,7 @@ export function ListItem() {
   }
 
   function getSuggestions(textInput: string) {
-    if (GOOGLE_AI_API_KEY) {
+    if (GOOGLE_AI_API_KEY && netInfo.isConnected) {
       debounce(() => {
         if (typeof textInput !== 'string' || textInput.trim().length < 3) {
           clearSuggestionList()
@@ -425,7 +465,7 @@ export function ListItem() {
         })
 
       return () => backHandler.remove()
-    }, [navigation, listId, listName])
+    }, [navigation, listId, listName, netInfo.isConnected])
   )
 
   const listItems = useMemo(() => {
@@ -440,7 +480,9 @@ export function ListItem() {
 
   return (
     <S.Wrapper>
-      {loading ? (
+      {!netInfo.isConnected ? (
+        <Disconnected />
+      ) : loading ? (
         <LoadingScreen />
       ) : listItems.length <= 0 && statusFilterSelected === undefined ? (
         <Empty
