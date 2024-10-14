@@ -9,6 +9,7 @@
 - Prettier
 - Firebase Auth
 - Firebase Firestore
+- Firebase Analytics
 - React Hooks Form
 - React Native
 - React Navigation

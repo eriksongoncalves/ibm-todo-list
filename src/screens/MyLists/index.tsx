@@ -23,6 +23,7 @@ import { Empty } from '@components/Empty'
 import { Disconnected } from '@components/Disconnected'
 import { LoadingScreen } from '@components/LoadingScreen'
 import { useAuth } from '@hooks/auth'
+import { logEvent, EVENT_TYPE } from '@utils/analitycs'
 
 import * as S from './styles'
 import { ListFormData, listFormResolver } from './validationSchema'
@@ -120,6 +121,12 @@ export function MyLists() {
             updated_at: firestoreDateUpdatedOrCreated
           })
 
+        await logEvent(EVENT_TYPE.ACTION, {
+          screen: 'MyLists',
+          elementName: 'Salvar',
+          description: `${listSelected ? 'Editou' : 'Criou'} a lista ${data.name}`
+        })
+
         const newState = [
           ...listData,
           {
@@ -158,6 +165,12 @@ export function MyLists() {
   }
 
   function handleCloseListMenuModal() {
+    logEvent(EVENT_TYPE.ACTION, {
+      screen: 'MyLists',
+      elementName: 'Opções',
+      description: `Fechou menu de opções da lista "${listSelected?.name}"`
+    })
+
     listMenuBottomSheetRef?.current?.dismiss()
   }
 
@@ -169,11 +182,23 @@ export function MyLists() {
   }
 
   function handleOpenListMenu(data: ListData) {
+    logEvent(EVENT_TYPE.ACTION, {
+      screen: 'MyLists',
+      elementName: 'Opções',
+      description: `Abriu menu de opções da lista "${data?.name}"`
+    })
+
     setListSelected(data)
     listMenuBottomSheetRef?.current?.present()
   }
 
   function handleAddNewList() {
+    logEvent(EVENT_TYPE.ACTION, {
+      screen: 'MyLists',
+      elementName: 'Adicionar',
+      description: 'Clicou em adicionar uma nova lista'
+    })
+
     setForceEnableDismiss(false)
     reset({ name: '' })
     setListSelected(undefined)
@@ -181,13 +206,18 @@ export function MyLists() {
   }
 
   function handleEditList() {
+    logEvent(EVENT_TYPE.ACTION, {
+      screen: 'MyLists',
+      elementName: 'Editar',
+      description: `Clicou em editar a lista ${listSelected!.name}`
+    })
     setForceEnableDismiss(false)
     listMenuBottomSheetRef.current?.dismiss()
     reset({ name: listSelected!.name })
     formBottomSheetRef.current?.present()
   }
 
-  function handleNavigateToList(data: ListData) {
+  async function handleNavigateToList(data: ListData) {
     if (!netInfo.isConnected) {
       Toast.show({
         visibilityTime: 3000,
@@ -200,13 +230,26 @@ export function MyLists() {
       return
     }
 
+    await logEvent(EVENT_TYPE.ACTION, {
+      screen: 'MyLists',
+      elementName: 'Visualizar',
+      description: `Clicou em visualizar itens da lista "${data.name}"`
+    })
+
     navigation.navigate('list_item', { listId: data.id!, name: data.name })
   }
 
   async function handleDeleteList() {
     try {
       setDeleteLoading(true)
+
       await firestore().collection('lists').doc(listSelected?.id).delete()
+
+      await logEvent(EVENT_TYPE.ACTION, {
+        screen: 'MyLists',
+        elementName: 'Deletar',
+        description: `Deletou a lista "${listSelected?.name}"`
+      })
 
       setListData(prevState =>
         prevState.filter(item => item.id !== listSelected?.id)
@@ -240,6 +283,12 @@ export function MyLists() {
         return
       }
 
+      logEvent(EVENT_TYPE.ACTION, {
+        screen: 'MyLists',
+        elementName: 'Deletar',
+        description: `Clicou em deletar lista - "${listSelected.name}"`
+      })
+
       Alert.alert(
         'Confirmação',
         `Deseja realmente remover "${listSelected.name}"?`,
@@ -272,6 +321,10 @@ export function MyLists() {
     useCallback(() => {
       try {
         setLoading(true)
+
+        logEvent(EVENT_TYPE.PAGE_VIEW, {
+          screen: 'MyLists'
+        })
 
         const unsubscribe = firestore()
           .collection('lists')

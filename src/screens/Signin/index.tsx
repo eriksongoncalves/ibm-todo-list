@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Image, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigation } from '@react-navigation/native'
@@ -8,6 +9,7 @@ import { Input } from '@components/Input'
 import { Button } from '@components/Button'
 import { Text } from '@components/Text'
 import { useAuth } from '@hooks/auth'
+import { logEvent, EVENT_TYPE } from '@utils/analitycs'
 
 import * as S from './styles'
 import { SignInFormData, signInFormResolver } from './validationSchema'
@@ -26,12 +28,21 @@ export function SignIn() {
     reValidateMode: 'onChange'
   })
 
-  function handleNavigateToSignUp() {
+  async function handleNavigateToSignUp() {
+    await logEvent(EVENT_TYPE.ACTION, {
+      screen: 'SignIn',
+      elementName: 'Criar conta'
+    })
+
     navigation.navigate('signup')
   }
 
   async function onSubmit(data: SignInFormData) {
     try {
+      await logEvent(EVENT_TYPE.ACTION, {
+        screen: 'SignIn',
+        elementName: 'Acessar'
+      })
       await signIn(data)
     } catch (error: any) {
       Toast.show({
@@ -42,6 +53,12 @@ export function SignIn() {
       })
     }
   }
+
+  useEffect(() => {
+    logEvent(EVENT_TYPE.PAGE_VIEW, {
+      screen: 'SignIn'
+    })
+  }, [])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

@@ -22,7 +22,8 @@ module.exports = function (api) {
             '@assets': './src/assets',
             '@shared': './src/shared',
             '@routes': './src/routes',
-            '@hooks': './src/hooks'
+            '@hooks': './src/hooks',
+            '@utils': './src/utils'
           }
         }
       ]

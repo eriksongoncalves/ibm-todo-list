@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { FlatList, BackHandler, Alert, Platform } from 'react-native'
+import {
+  FlatList,
+  BackHandler,
+  Alert,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard
+} from 'react-native'
 import {
   TabActions,
   useNavigation,
@@ -40,6 +47,7 @@ import { Input, SuggestionsList } from '@components/Input'
 import { BottomModalWrapper } from '@components/BottomModalWrapper'
 import { Radio } from '@components/Radio'
 import { useDebounce } from '@hooks/useDebounce'
+import { logEvent, EVENT_TYPE } from '@utils/analitycs'
 
 type RouteParams = {
   listId: string
@@ -138,6 +146,12 @@ export function ListItem() {
           }))
         })
 
+      await logEvent(EVENT_TYPE.ACTION, {
+        screen: 'ListItem',
+        elementName: 'Salvar',
+        description: `${itemSelected ? 'Editou' : 'Criou'} o item "${data.description}" da lista "${listName}"`
+      })
+
       setListData(prevState => ({
         ...prevState!,
         items
@@ -198,6 +212,12 @@ export function ListItem() {
         items
       }))
 
+      await logEvent(EVENT_TYPE.ACTION, {
+        screen: 'ListItem',
+        elementName: 'Editar',
+        description: `Marcou o item ${data.description} como completo da lista ${listName}`
+      })
+
       await firestore()
         .collection('lists')
         .doc(listData!.id)
@@ -227,6 +247,12 @@ export function ListItem() {
   }
 
   function handleOpenFormModal() {
+    logEvent(EVENT_TYPE.ACTION, {
+      screen: 'ListItem',
+      elementName: 'Adicionar',
+      description: `Clicou em adicionar um item na lista "${listName}"`
+    })
+
     formBottomSheetRef.current?.present()
     setItemSelected(undefined)
     reset({
@@ -237,6 +263,12 @@ export function ListItem() {
   }
 
   function handleEdit(data: ListItemData) {
+    logEvent(EVENT_TYPE.ACTION, {
+      screen: 'ListItem',
+      elementName: 'Editar',
+      description: `Clicou em editar o item "${data.description}" da lista "${listName}"`
+    })
+
     setItemSelected(data)
     reset({
       description: data.description,
@@ -262,6 +294,12 @@ export function ListItem() {
 
       await firestore().collection('lists').doc(listData?.id).update({
         items
+      })
+
+      await logEvent(EVENT_TYPE.ACTION, {
+        screen: 'ListItem',
+        elementName: 'Deletar',
+        description: `Deletou o item "${itemSelected?.description}" da lista "${listName}"`
       })
 
       setListData(prevState => ({
@@ -304,6 +342,12 @@ export function ListItem() {
         return
       }
 
+      logEvent(EVENT_TYPE.ACTION, {
+        screen: 'ListItem',
+        elementName: 'Deletar',
+        description: `Clicou em deletar o item "${itemSelected.description}" da lista "${listName}"`
+      })
+
       Alert.alert('Confirmação', `Deseja realmente remover este item?`, [
         {
           text: 'Cancelar',
@@ -344,13 +388,10 @@ export function ListItem() {
                   .trim()
                 const textToJson = JSON.parse(textFormatted)
 
-                console.log('suggestions textToJson >>>', textToJson)
-
                 const { success, data } =
                   suggestionItemsSchema.safeParse(textToJson)
                 const suggestions = success ? data : []
 
-                console.log('suggestions >>>', suggestions)
                 setSuggestionsList(suggestions)
               } else {
                 clearSuggestionList()
@@ -372,6 +413,12 @@ export function ListItem() {
         <Button
           variant="ghost"
           onPress={() => {
+            logEvent(EVENT_TYPE.ACTION, {
+              screen: 'ListItem',
+              elementName: 'Back',
+              description: `Voltou para as listas`
+            })
+
             const jumpToAction = TabActions.jumpTo('my_lists_tab')
             setLoading(true)
             navigation.dispatch(jumpToAction)
@@ -415,11 +462,21 @@ export function ListItem() {
         'hardwareBackPress',
         () => {
           setLoading(true)
+          logEvent(EVENT_TYPE.ACTION, {
+            screen: 'ListItem',
+            elementName: 'Back',
+            description: `Voltou para as listas`
+          })
+
           const jumpToAction = TabActions.jumpTo('my_lists_tab')
           navigation.dispatch(jumpToAction)
           return true
         }
       )
+
+      logEvent(EVENT_TYPE.PAGE_VIEW, {
+        screen: 'ListItem'
+      })
 
       firestore()
         .collection('lists')
@@ -479,228 +536,239 @@ export function ListItem() {
   }, [listData?.items, statusFilterSelected])
 
   return (
-    <S.Wrapper>
-      {!netInfo.isConnected ? (
-        <Disconnected />
-      ) : loading ? (
-        <LoadingScreen />
-      ) : listItems.length <= 0 && statusFilterSelected === undefined ? (
-        <Empty
-          description="Você ainda não tem nenhum item adicionado na sua lista!"
-          actionDescription="Adicionar um item"
-          onPress={handleOpenFormModal}
-        />
-      ) : (
-        <S.ListWrapper>
-          <S.Filter>
-            <Text
-              fontFamily="robotoBold"
-              color="white"
-              style={{ width: 'auto' }}
-            >
-              Filtrar por:
-            </Text>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss()
+        clearSuggestionList()
+      }}
+      accessible={false}
+    >
+      <S.Wrapper>
+        {!netInfo.isConnected ? (
+          <Disconnected />
+        ) : loading ? (
+          <LoadingScreen />
+        ) : listItems.length <= 0 && statusFilterSelected === undefined ? (
+          <Empty
+            description="Você ainda não tem nenhum item adicionado na sua lista!"
+            actionDescription="Adicionar um item"
+            onPress={handleOpenFormModal}
+          />
+        ) : (
+          <S.ListWrapper>
+            <S.Filter>
+              <Text
+                fontFamily="robotoBold"
+                color="white"
+                style={{ width: 'auto' }}
+              >
+                Filtrar por:
+              </Text>
 
-            <S.Select>
-              <Dropdown
-                ref={ref}
-                data={filterStatusData}
-                style={{
-                  borderRadius: 5,
-                  backgroundColor: theme.colors.gray_600,
-                  padding: 8
-                  // marginLeft: 'auto'
+              <S.Select>
+                <Dropdown
+                  ref={ref}
+                  data={filterStatusData}
+                  style={{
+                    borderRadius: 5,
+                    backgroundColor: theme.colors.gray_600,
+                    padding: 8
+                    // marginLeft: 'auto'
+                  }}
+                  containerStyle={{
+                    top: Platform.OS === 'ios' ? -20 : 2,
+                    backgroundColor: theme.colors.gray_600,
+                    borderColor: theme.colors.gray_300
+                  }}
+                  fontFamily={theme.fonts.family.roboto.regular}
+                  activeColor={theme.colors.gray_500}
+                  itemTextStyle={{
+                    color: theme.colors.gray_300,
+                    fontFamily: theme.fonts.family.roboto.regular
+                  }}
+                  placeholderStyle={{
+                    color: theme.colors.gray_200,
+                    fontFamily: theme.fonts.family.roboto.regular
+                  }}
+                  selectedTextStyle={{
+                    color: theme.colors.gray_200,
+                    fontFamily: theme.fonts.family.roboto.regular
+                  }}
+                  dropdownPosition="bottom"
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder="Todos"
+                  value={statusFilterSelected}
+                  closeModalWhenSelectedItem={false}
+                  onChange={item => {
+                    setStatusFilterSelected(item.value)
+                    ref.current?.close()
+                  }}
+                />
+              </S.Select>
+            </S.Filter>
+
+            <FlatList
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              data={listItems}
+              keyExtractor={item => String(item.id)}
+              renderItem={({ item }) => (
+                <S.Item>
+                  <S.TitleWrapper>
+                    <Radio
+                      isChecked={item.status === 'done'}
+                      onPress={() => handleCompleteItem(item)}
+                    />
+
+                    <Text
+                      fontFamily="robotoBold"
+                      size={18}
+                      mb={4}
+                      style={[
+                        { flex: 1 },
+                        item.status === 'done' && {
+                          textDecorationLine: 'line-through'
+                        }
+                      ]}
+                    >
+                      {item.description}
+                    </Text>
+
+                    <Button variant="ghost" onPress={() => handleEdit(item)}>
+                      <AntDesign
+                        name="edit"
+                        size={24}
+                        color={theme.colors.gray_200}
+                      />
+                    </Button>
+                  </S.TitleWrapper>
+                </S.Item>
+              )}
+            />
+          </S.ListWrapper>
+        )}
+
+        <BottomModalWrapper
+          ref={formBottomSheetRef}
+          snapPoints={formSnapPoints}
+          title={`${itemSelected ? 'Editar item' : 'Novo item'}`}
+          onClose={handleCloseFormModal}
+          onDismiss={handleCloseFormModal}
+        >
+          <Text fontFamily="robotoBold" color="white" mb={8} mt={16}>
+            Descrição
+          </Text>
+
+          <Controller
+            name="description"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Descrição"
+                onChangeText={text => {
+                  clearSuggestionList()
+                  onChange(text)
+                  getSuggestions(text)
                 }}
-                containerStyle={{
-                  top: Platform.OS === 'ios' ? -20 : 2,
-                  backgroundColor: theme.colors.gray_600,
-                  borderColor: theme.colors.gray_300
+                value={value}
+                errorMessage={errors.description?.message}
+                mb={16}
+                onBlur={() => {
+                  clearSuggestionList()
                 }}
-                fontFamily={theme.fonts.family.roboto.regular}
-                activeColor={theme.colors.gray_500}
-                itemTextStyle={{
-                  color: theme.colors.gray_300,
-                  fontFamily: theme.fonts.family.roboto.regular
-                }}
-                placeholderStyle={{
-                  color: theme.colors.gray_200,
-                  fontFamily: theme.fonts.family.roboto.regular
-                }}
-                selectedTextStyle={{
-                  color: theme.colors.gray_200,
-                  fontFamily: theme.fonts.family.roboto.regular
-                }}
-                dropdownPosition="bottom"
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder="Todos"
-                value={statusFilterSelected}
-                closeModalWhenSelectedItem={false}
-                onChange={item => {
-                  setStatusFilterSelected(item.value)
-                  ref.current?.close()
+                suggestions={suggestionsList}
+                onSuggestionPress={item => {
+                  onChange(item)
+                  clearSuggestionList()
                 }}
               />
-            </S.Select>
-          </S.Filter>
-
-          <FlatList
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-            data={listItems}
-            keyExtractor={item => String(item.id)}
-            renderItem={({ item }) => (
-              <S.Item>
-                <S.TitleWrapper>
-                  <Radio
-                    isChecked={item.status === 'done'}
-                    onPress={() => handleCompleteItem(item)}
-                  />
-
-                  <Text
-                    fontFamily="robotoBold"
-                    size={18}
-                    mb={4}
-                    style={[
-                      { flex: 1 },
-                      item.status === 'done' && {
-                        textDecorationLine: 'line-through'
-                      }
-                    ]}
-                  >
-                    {item.description}
-                  </Text>
-
-                  <Button variant="ghost" onPress={() => handleEdit(item)}>
-                    <AntDesign
-                      name="edit"
-                      size={24}
-                      color={theme.colors.gray_200}
-                    />
-                  </Button>
-                </S.TitleWrapper>
-              </S.Item>
             )}
           />
-        </S.ListWrapper>
-      )}
-
-      <BottomModalWrapper
-        ref={formBottomSheetRef}
-        snapPoints={formSnapPoints}
-        title={`${itemSelected ? 'Editar item' : 'Novo item'}`}
-        onClose={handleCloseFormModal}
-        onDismiss={handleCloseFormModal}
-      >
-        <Text fontFamily="robotoBold" color="white" mb={8} mt={16}>
-          Descrição
-        </Text>
-
-        <Controller
-          name="description"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Input
-              placeholder="Descrição"
-              onChangeText={text => {
-                clearSuggestionList()
-                onChange(text)
-                getSuggestions(text)
-              }}
-              value={value}
-              errorMessage={errors.description?.message}
-              mb={16}
-              suggestions={suggestionsList}
-              onSuggestionPress={item => {
-                onChange(item)
-                clearSuggestionList()
-              }}
-            />
-          )}
-        />
-        <Text fontFamily="robotoBold" color="white" mb={8} mt={22}>
-          Status
-        </Text>
-        <Controller
-          name="status"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <S.StatusWrapper>
-              <S.StatusButton
-                onPress={() => onChange('pending')}
-                isActive={!value || value === 'pending'}
-              >
-                <Text color="white">Pendente</Text>
-              </S.StatusButton>
-              <S.StatusButton
-                onPress={() => onChange('in_progress')}
-                isActive={value === 'in_progress'}
-                style={{ flex: 1 }}
-              >
-                <Text color="white">Em Andamento</Text>
-              </S.StatusButton>
-              <S.StatusButton
-                onPress={() => onChange('done')}
-                isActive={value === 'done'}
-              >
-                <Text color="white">Concluída</Text>
-              </S.StatusButton>
-            </S.StatusWrapper>
-          )}
-        />
-        <Text fontFamily="robotoBold" color="white" mb={8} mt={22}>
-          Comentário
-        </Text>
-        <Controller
-          name="comments"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Input
-              placeholder="Escreva aqui..."
-              multiline
-              numberOfLines={7}
-              onChangeText={onChange}
-              value={value}
-              errorMessage={errors.comments?.message}
-              mb={16}
-            />
-          )}
-        />
-        <Button
-          onPress={handleSubmit(onSaveItem)}
-          loading={formLoading}
-          disabled={formDeleteLoading}
-        >
-          <Text color="white">Salvar</Text>
-        </Button>
-        {itemSelected && (
+          <Text fontFamily="robotoBold" color="white" mb={8} mt={22}>
+            Status
+          </Text>
+          <Controller
+            name="status"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <S.StatusWrapper>
+                <S.StatusButton
+                  onPress={() => onChange('pending')}
+                  isActive={!value || value === 'pending'}
+                >
+                  <Text color="white">Pendente</Text>
+                </S.StatusButton>
+                <S.StatusButton
+                  onPress={() => onChange('in_progress')}
+                  isActive={value === 'in_progress'}
+                  style={{ flex: 1 }}
+                >
+                  <Text color="white">Em Andamento</Text>
+                </S.StatusButton>
+                <S.StatusButton
+                  onPress={() => onChange('done')}
+                  isActive={value === 'done'}
+                >
+                  <Text color="white">Concluída</Text>
+                </S.StatusButton>
+              </S.StatusWrapper>
+            )}
+          />
+          <Text fontFamily="robotoBold" color="white" mb={8} mt={22}>
+            Comentário
+          </Text>
+          <Controller
+            name="comments"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Escreva aqui..."
+                multiline
+                numberOfLines={7}
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.comments?.message}
+                mb={16}
+              />
+            )}
+          />
           <Button
-            variant="ghost"
-            mt={16}
-            onPress={handleConfirmDeleteItem}
-            disabled={formDeleteLoading || formLoading}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 16,
-              gap: 8
-            }}
+            onPress={handleSubmit(onSaveItem)}
+            loading={formLoading}
+            disabled={formDeleteLoading}
           >
-            <FontAwesome
-              name="trash-o"
-              size={22}
-              color={theme.colors.red_600}
-            />
-            <Text fontFamily="robotoBold" color="red_600" ml={10} mt={8}>
-              {formDeleteLoading ? 'Deletando...' : 'Deletar'}
-            </Text>
+            <Text color="white">Salvar</Text>
           </Button>
-        )}
-      </BottomModalWrapper>
+          {itemSelected && (
+            <Button
+              variant="ghost"
+              mt={16}
+              onPress={handleConfirmDeleteItem}
+              disabled={formDeleteLoading || formLoading}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 16,
+                gap: 8
+              }}
+            >
+              <FontAwesome
+                name="trash-o"
+                size={22}
+                color={theme.colors.red_600}
+              />
+              <Text fontFamily="robotoBold" color="red_600" ml={10} mt={8}>
+                {formDeleteLoading ? 'Deletando...' : 'Deletar'}
+              </Text>
+            </Button>
+          )}
+        </BottomModalWrapper>
 
-      <Toast />
-    </S.Wrapper>
+        <Toast />
+      </S.Wrapper>
+    </TouchableWithoutFeedback>
   )
 }
