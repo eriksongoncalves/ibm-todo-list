@@ -37,7 +37,11 @@ export function Button({
       ml={ml}
       {...rest}
     >
-      {loading ? <ActivityIndicator color={theme.colors.white} /> : children}
+      {loading ? (
+        <ActivityIndicator color={theme.colors.white} testID="buttonLoading" />
+      ) : (
+        children
+      )}
     </S.ButtonWrapper>
   )
 }
