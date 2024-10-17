@@ -7,8 +7,8 @@ import { Button } from '@components/Button'
 import * as S from './styles'
 
 type EmptyActions = {
-  actionDescription: string
-  onPress: () => void
+  actionDescription?: string
+  onPress?: () => void
 }
 
 type EmptyProps = {
@@ -29,11 +29,14 @@ export function Empty({ description, actionDescription, onPress }: EmptyProps) {
       <Text align="center" size={20} color="gray_300">
         {description}
       </Text>
-      <Button variant="ghost" onPress={onPress}>
-        <Text fontFamily="robotoBold" color="green_500" size={20}>
-          {actionDescription}
-        </Text>
-      </Button>
+
+      {!!onPress && actionDescription && (
+        <Button variant="ghost" onPress={onPress} testID="emptyButtonAction">
+          <Text fontFamily="robotoBold" color="green_500" size={20}>
+            {actionDescription}
+          </Text>
+        </Button>
+      )}
     </S.Wrapper>
   )
 }
