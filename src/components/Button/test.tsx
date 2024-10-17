@@ -82,7 +82,7 @@ describe('Button component', () => {
     expect(buttonComponent.props.accessibilityState.disabled).toBe(true)
     expect(loadingComponent).toBeTruthy()
 
-    fireEvent(buttonComponent, 'click')
+    fireEvent.press(buttonComponent)
 
     expect(mockFn).not.toHaveBeenCalled()
   })
@@ -96,7 +96,7 @@ describe('Button component', () => {
 
     const buttonComponent = getByTestId('myButton')
 
-    fireEvent(buttonComponent, 'click')
+    fireEvent.press(buttonComponent)
 
     expect(mockFn).toHaveBeenCalled()
   })
