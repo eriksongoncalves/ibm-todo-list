@@ -65,6 +65,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           mt={mt}
           mb={!errorMessage ? mb : undefined}
           {...rest}
+          testID="myInput"
         />
 
         {!!errorMessage && (
