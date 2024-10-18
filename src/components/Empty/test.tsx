@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@utils/test-utils'
+import { render } from '@utils/test-utils'
 
 import { Empty } from './'
 

@@ -3,7 +3,10 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules', '/android', '/ios', '/.expo'],
   setupFilesAfterEnv: [
     '@testing-library/jest-native/extend-expect',
-    './src/utils/jest/__mocks__/vector-icons.ts'
+    './src/utils/jest/__mocks__/vector-icons.js',
+    './src/utils/jest/__mocks__/react-native-reanimated.js',
+    './src/utils/jest/__mocks__/bottom-sheet.js',
+    './node_modules/react-native-gesture-handler/jestSetup.js'
   ],
   modulePaths: ['<rootDir>/src/'],
   collectCoverageFrom: [

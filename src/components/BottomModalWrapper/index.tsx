@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react'
+import { forwardRef } from 'react'
 import {
   BottomSheetModal,
   BottomSheetModalProps,
@@ -31,9 +31,9 @@ export const BottomModalWrapper = forwardRef<
       enableContentPanningGesture={false}
       containerStyle={{ backgroundColor: 'rgba(0,0,0,.7)' }}
       backgroundStyle={{ backgroundColor: theme.colors.gray_400 }}
-      enableDismissOnClose={
-        forceEnableDismiss !== null ? forceEnableDismiss : false
-      }
+      // enableDismissOnClose={
+      //   forceEnableDismiss !== null ? forceEnableDismiss : false
+      // }
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
       {...rest}
@@ -52,7 +52,7 @@ export const BottomModalWrapper = forwardRef<
               {title}
             </Text>
 
-            <S.CloseButton onPress={onClose}>
+            <S.CloseButton onPress={onClose} testID="bottomSheetModalClose">
               <AntDesign name="close" size={16} color={theme.colors.white} />
             </S.CloseButton>
           </S.Header>
