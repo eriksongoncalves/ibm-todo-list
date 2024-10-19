@@ -1,6 +1,6 @@
-import Ionicons from '@expo/vector-icons/Ionicons'
 import { TouchableWithoutFeedback } from 'react-native'
 import { useTheme } from 'styled-components/native'
+import { Ionicons } from '@expo/vector-icons'
 
 import { Text } from '../Text'
 import * as S from './styles'
@@ -21,6 +21,7 @@ export function Radio({ label = '', isChecked = false, onPress }: RadioProps) {
           name={`radio-button-${isChecked ? 'on' : 'off'}`}
           size={24}
           color={theme.colors.green_500}
+          testID="checkIcon"
         />
 
         {label && <Text color="white">{label}</Text>}
