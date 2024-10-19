@@ -4,7 +4,7 @@ export const useDebounce = () => {
   const timeoutRef = useRef<any | null>(null)
 
   useEffect(() => {
-    ;() => timeoutRef.current && clearTimeout(timeoutRef.current)
+    return () => timeoutRef.current && clearTimeout(timeoutRef.current)
   }, [])
 
   const debounce = useCallback((callbackFn: () => void, timeMs = 500) => {
