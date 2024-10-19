@@ -9,7 +9,7 @@ type ContainerProps = {
 }
 
 export const Wrapper = styled.View<ContainerProps>`
-  ${({ theme, mt, mb }) => css`
+  ${({ mt, mb }) => css`
     width: 100%;
     flex-direction: row;
     gap: 16px;

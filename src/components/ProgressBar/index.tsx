@@ -40,6 +40,7 @@ export function ProgressBar({
         unfilledColor={theme.colors.gray_400}
         borderWidth={0}
         color={theme.colors.green_500}
+        testID="progressBar"
         {...rest}
       />
 
