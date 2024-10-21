@@ -26,7 +26,7 @@ export type AuthContextProps = {
   signIn(credentials: SignInCredentials): Promise<void>
   signOut(): Promise<void>
   signUp(data: SignUpInput): Promise<void>
-  forgotPassword: (email: string) => Promise<void>
+  // forgotPassword: (email: string) => Promise<void>
   updateProfile: (data: UpdateProfileInput) => Promise<void>
 }
 

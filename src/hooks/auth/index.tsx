@@ -111,24 +111,24 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
     }
   }
 
-  const forgotPassword = async (email: string) => {
-    try {
-      setLoading(true)
+  // const forgotPassword = async (email: string) => {
+  //   try {
+  //     setLoading(true)
 
-      verifyInternet()
+  //     verifyInternet()
 
-      await auth().sendPasswordResetEmail(email)
-    } catch (error) {
-      const errorMessage =
-        error instanceof NoInternetError
-          ? error.message
-          : 'Ocorreu um erro ao tentar enviar o e-mail'
+  //     await auth().sendPasswordResetEmail(email)
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error instanceof NoInternetError
+  //         ? error.message
+  //         : 'Ocorreu um erro ao tentar enviar o e-mail'
 
-      throw new Error(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     throw new Error(errorMessage)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const updateProfile = async (data: types.UpdateProfileInput) => {
     try {
@@ -196,7 +196,7 @@ const AuthProvider = ({ children }: types.AuthProviderProps) => {
         signIn,
         signOut,
         signUp,
-        forgotPassword,
+        // forgotPassword,
         updateProfile
       }}
     >
