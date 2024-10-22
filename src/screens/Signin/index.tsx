@@ -43,6 +43,7 @@ export function SignIn() {
         screen: 'SignIn',
         elementName: 'Acessar'
       })
+
       await signIn(data)
     } catch (error: any) {
       Toast.show({
@@ -141,7 +142,6 @@ export function SignIn() {
             </Text>
           </Button>
         </S.BottomWrapper>
-        <Toast />
       </S.Wrapper>
     </TouchableWithoutFeedback>
   )

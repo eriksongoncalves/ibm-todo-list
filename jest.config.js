@@ -7,6 +7,8 @@ module.exports = {
     './src/utils/jest/__mocks__/react-native-reanimated.js',
     './src/utils/jest/__mocks__/bottom-sheet.js',
     './src/utils/jest/__mocks__/react-native-progress.js',
+    './src/utils/jest/__mocks__/react-native-iphone-x-helper.js',
+    './src/utils/jest/__mocks__/utils-analitycs.js',
     './node_modules/react-native-gesture-handler/jestSetup.js'
   ],
   modulePaths: ['<rootDir>/src/'],

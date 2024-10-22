@@ -9,6 +9,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ThemeProvider } from 'styled-components'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import Toast from 'react-native-toast-message'
 
 import { Routes } from '@src/routes'
 import { theme } from '@shared/theme'
@@ -42,6 +43,8 @@ export default function App() {
           </BottomSheetModalProvider>
         </AuthProvider>
       </ThemeProvider>
+
+      <Toast />
     </GestureHandlerRootView>
   )
 }
