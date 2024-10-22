@@ -22,7 +22,11 @@
 
 ## Telas da aplicação
 
-- [Ver as telas](./screenshots)
+[Ver as telas](./screenshots)
+
+<br />
+
+<img src="./screenshots/screens.jpg" alt="Screens" />
 
 <br />
 
