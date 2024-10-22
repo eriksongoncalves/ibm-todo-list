@@ -175,7 +175,6 @@ export function SignUp() {
             </Text>
           </Button>
         </S.BottomWrapper>
-        <Toast />
       </S.Wrapper>
     </TouchableWithoutFeedback>
   )

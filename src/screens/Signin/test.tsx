@@ -21,7 +21,7 @@ jest.mock('@react-navigation/native', () => ({
 
 jest.mock('react-native-toast-message', () => {
   return {
-    show: () => mockToast()
+    show: (props: any) => mockToast(props)
   }
 })
 
@@ -81,7 +81,7 @@ describe('SignIn screen', () => {
   it('should not be do login when there is an error', async () => {
     const { debug, getByText, getByPlaceholderText } = render(<SignIn />)
 
-    mockSignIn.mockRejectedValueOnce(new Error())
+    mockSignIn.mockRejectedValueOnce(new Error('Generic error'))
 
     const inputEmail = getByPlaceholderText(/E-mail/i)
     const inputPassword = getByPlaceholderText(/Senha/i)
@@ -97,7 +97,12 @@ describe('SignIn screen', () => {
     fireEvent.press(buttonText)
 
     waitFor(() => {
-      expect(mockToast).toHaveBeenCalled()
+      expect(mockToast).toHaveBeenCalledWith({
+        visibilityTime: 2000,
+        type: 'error',
+        text1: 'Opss...',
+        text2: 'Generic error'
+      })
     })
   })
 })
