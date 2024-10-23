@@ -8,7 +8,7 @@ export const profileFormDataSchema = z
       .min(1, 'Campo obrigatório'),
     email: z
       .string({ message: 'Campo obrigatório' })
-      .min(1, 'E-mail obrigatório')
+      .min(1, 'Campo obrigatório')
       .email('E-mail inválido'),
 
     password: z.string().optional(),

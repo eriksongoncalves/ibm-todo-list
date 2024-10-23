@@ -72,7 +72,7 @@ export function Profile() {
         password: '',
         confirm_password: ''
       })
-    }, [user])
+    }, [])
   )
 
   return (
@@ -135,7 +135,7 @@ export function Profile() {
             control={control}
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Confirmar senha  (Opcional)"
+                placeholder="Confirmar senha"
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
@@ -151,7 +151,6 @@ export function Profile() {
             </Text>
           </Button>
         </S.Content>
-        <Toast />
       </S.Wrapper>
     </TouchableWithoutFeedback>
   )

@@ -157,7 +157,6 @@ export function MyLists() {
         text1: 'Opss...',
         text2: 'Ocorreu um erro ao salvar os dados'
       })
-      console.log('>>> onSaveList error', e)
     } finally {
       setFormLoading(false)
       handleCloseFormModal()
@@ -263,7 +262,6 @@ export function MyLists() {
         text1: 'Opss...',
         text2: 'Ocorreu um erro ao deletar a lista'
       })
-      console.log('>>> handleDeleteList Error', e)
     } finally {
       setDeleteLoading(false)
     }

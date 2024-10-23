@@ -172,7 +172,6 @@ export function ListItem() {
         text1: 'Opss...',
         text2: 'Ocorreu um erro ao salvar os dados'
       })
-      console.log('>>> onSaveList error', e)
     } finally {
       setFormLoading(false)
       handleCloseFormModal()
@@ -242,7 +241,6 @@ export function ListItem() {
           return item.id === data.id ? data : item
         })
       }))
-      console.log('>>> handleCompleteItem error', e)
     }
   }
 
@@ -322,7 +320,6 @@ export function ListItem() {
         text1: 'Opss...',
         text2: 'Ocorreu um erro ao deletar o item da lista'
       })
-      console.log('>>> handleDeleteList Error', e)
     } finally {
       setFormDeleteLoading(false)
     }
