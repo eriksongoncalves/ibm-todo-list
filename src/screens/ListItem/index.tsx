@@ -763,8 +763,6 @@ export function ListItem() {
             </Button>
           )}
         </BottomModalWrapper>
-
-        <Toast />
       </S.Wrapper>
     </TouchableWithoutFeedback>
   )

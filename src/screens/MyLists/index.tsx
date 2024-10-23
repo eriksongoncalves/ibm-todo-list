@@ -491,7 +491,6 @@ export function MyLists() {
           </Text>
         </S.MenuItem>
       </BottomModalWrapper>
-      <Toast />
     </S.Wrapper>
   )
 }
