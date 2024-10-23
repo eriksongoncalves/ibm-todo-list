@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NavigationContext } from '@react-navigation/native'
 
 import { render, fireEvent, waitFor } from '@utils/test-utils'

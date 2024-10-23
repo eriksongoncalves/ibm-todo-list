@@ -1,5 +1,5 @@
 import { useState, forwardRef } from 'react'
-import { TextInput, TextInputProps, ScrollView, Keyboard } from 'react-native'
+import { TextInput, TextInputProps, Keyboard } from 'react-native'
 import { useTheme } from 'styled-components/native'
 
 import * as S from './styles'

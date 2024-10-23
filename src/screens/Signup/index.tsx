@@ -37,7 +37,7 @@ export function SignUp() {
     navigation.goBack()
   }
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: SignUpFormData) {
     try {
       await logEvent(EVENT_TYPE.ACTION, {
         screen: 'SignUp',
@@ -54,6 +54,7 @@ export function SignUp() {
       })
 
       handleNavigateToSignIn()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       Toast.show({
         visibilityTime: 2000,

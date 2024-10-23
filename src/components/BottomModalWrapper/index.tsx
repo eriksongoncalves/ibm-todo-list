@@ -21,6 +21,7 @@ type BottomModalProps = {
 export const BottomModalWrapper = forwardRef<
   BottomSheetModal,
   BottomModalProps
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 >(({ title = '', children, onClose, forceEnableDismiss, ...rest }, ref) => {
   const theme = useTheme()
 

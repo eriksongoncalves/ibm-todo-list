@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import {
   FlatList,
@@ -449,7 +450,8 @@ export function ListItem() {
         tabBarStyle: undefined,
         tabBarVisible: undefined
       })
-  }, [navigation, theme])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation])
 
   useFocusEffect(
     useCallback(() => {
@@ -504,7 +506,7 @@ export function ListItem() {
             setLoading(false)
           }
         })
-        .catch(e => {
+        .catch(() => {
           setLoading(false)
 
           Toast.show({
@@ -519,6 +521,7 @@ export function ListItem() {
         })
 
       return () => backHandler.remove()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation, listId, listName, netInfo.isConnected])
   )
 

@@ -12,6 +12,7 @@ export const AllTheProviders = ({ children }: AllTheProvidersProps) => (
   <ThemeProvider theme={theme}>{children}</ThemeProvider>
 )
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const customRender = (ui: React.ReactElement<any>, options?: RenderOptions) =>
   render(ui, { wrapper: AllTheProviders, ...options } as RenderOptions)
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, fireEvent, waitFor } from '@utils/test-utils'
 
 import { SignIn } from './'
@@ -46,7 +47,7 @@ describe('SignIn screen', () => {
   })
 
   it('should not be do login when fields are invalid', async () => {
-    const { debug, getByText, findAllByText } = render(<SignIn />)
+    const { getByText, findAllByText } = render(<SignIn />)
 
     const buttonText = getByText(/acessar/i)
 
@@ -79,7 +80,7 @@ describe('SignIn screen', () => {
   })
 
   it('should not be do login when there is an error', async () => {
-    const { debug, getByText, getByPlaceholderText } = render(<SignIn />)
+    const { getByText, getByPlaceholderText } = render(<SignIn />)
 
     mockSignIn.mockRejectedValueOnce(new Error('Generic error'))
 

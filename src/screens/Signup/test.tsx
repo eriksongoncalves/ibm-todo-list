@@ -21,6 +21,7 @@ jest.mock('@react-navigation/native', () => ({
 
 jest.mock('react-native-toast-message', () => {
   return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     show: (props: any) => mockToast(props)
   }
 })

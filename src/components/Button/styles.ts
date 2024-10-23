@@ -12,6 +12,7 @@ const variants = {
   outline: (theme: DefaultTheme) => css`
     border: 1px solid ${theme.colors.green_500};
   `,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ghost: (theme: DefaultTheme) => css`
     width: auto;
     padding: 0;

@@ -50,6 +50,7 @@ export function Profile() {
         text1: '\\o/',
         text2: 'Dados salvos com sucesso!'
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       Toast.show({
         visibilityTime: 2000,
@@ -72,7 +73,8 @@ export function Profile() {
         password: '',
         confirm_password: ''
       })
-    }, [])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.name, user?.email])
   )
 
   return (

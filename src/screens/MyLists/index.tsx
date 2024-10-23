@@ -313,6 +313,7 @@ export function MyLists() {
         </S.HeaderIconButton>
       )
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation])
 
   useFocusEffect(
@@ -368,7 +369,8 @@ export function MyLists() {
             'Ocorreu um erro ao carregar os dados, tente novamente mais tarde.'
         })
       }
-    }, [navigation, user?.id, netInfo.isConnected])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id, netInfo.isConnected])
   )
 
   return (

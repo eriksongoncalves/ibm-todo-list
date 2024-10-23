@@ -45,6 +45,7 @@ export function SignIn() {
       })
 
       await signIn(data)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       Toast.show({
         visibilityTime: 2000,

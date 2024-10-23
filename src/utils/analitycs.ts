@@ -29,6 +29,7 @@ export async function logEvent(event: EVENT_TYPE, params: PARAMS) {
     ...params
   }
 
+  // eslint-disable-next-line no-console
   console.log(`>>> FIREBASE ${event} `, params)
 
   return await firebaseAnalytics.logEvent(event, params)

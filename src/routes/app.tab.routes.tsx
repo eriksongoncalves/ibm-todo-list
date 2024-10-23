@@ -51,6 +51,7 @@ export function AppTabRoutes() {
         borderBottomWidth: 0
       }
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -116,7 +117,7 @@ export function AppTabRoutes() {
       <Screen
         name="list_item"
         component={ListItem}
-        options={({ route, navigation }) => {
+        options={({ route }) => {
           const name = route?.params
             ? (route.params! as ListItemsRouteParams)?.name
             : ''

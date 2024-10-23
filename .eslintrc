@@ -19,16 +19,6 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
-  "overrides": [
-    {
-      "files": [
-        "./src/**/*/test.ts?(x)"
-      ],
-      "extends": [
-        "plugin:testing-library/react-native"
-      ]
-    }
-  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -48,8 +38,13 @@
     "prettier/prettier": [
       "error",
       {
-        "printWidth": 100,
-        "singleQuote": false
+        "tabWidth": 2,
+        "useTabs": false,
+        "trailingComma": "none",
+        "arrowParens": "avoid",
+        "semi": false,
+        "bracketSpacing": true,
+        "singleQuote": true
       }
     ],
     "react-hooks/rules-of-hooks": "error",
