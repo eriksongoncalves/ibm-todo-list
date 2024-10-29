@@ -522,7 +522,7 @@ export function ListItem() {
 
       return () => backHandler.remove()
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigation, listId, listName, netInfo.isConnected])
+    }, [listId, listName, netInfo.isConnected])
   )
 
   const listItems = useMemo(() => {

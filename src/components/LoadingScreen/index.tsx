@@ -8,7 +8,11 @@ export function LoadingScreen() {
 
   return (
     <S.Wrapper>
-      <ActivityIndicator color={theme.colors.green_500} size="large" />
+      <ActivityIndicator
+        color={theme.colors.green_500}
+        size="large"
+        testID="loadingScreen"
+      />
     </S.Wrapper>
   )
 }
