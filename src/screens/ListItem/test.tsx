@@ -8,22 +8,56 @@ const navContextValue = {
   addListener: jest.fn(() => jest.fn())
 } as any
 
+const listDataWithoutItems = {
+  name: 'Lista da compras',
+  user_id: 'USER_ID',
+  items: [],
+  created_at: {
+    toDate: () => new Date()
+  },
+  updated_at: {
+    toDate: () => new Date()
+  }
+}
+
+const listDataWithItems = {
+  ...listDataWithoutItems,
+  items: [
+    {
+      id: '1',
+      description: 'Item 1',
+      status: 'done',
+      comments: 'teste',
+      created_at: {
+        toDate: () => new Date()
+      },
+      updated_at: {
+        toDate: () => new Date()
+      }
+    },
+    {
+      id: '2',
+      description: 'Item 2',
+      status: 'pending',
+      comments: '',
+      created_at: {
+        toDate: () => new Date()
+      },
+      updated_at: {
+        toDate: () => new Date()
+      }
+    }
+  ]
+}
+
 const mockNavigate = jest.fn()
 const mockToast = jest.fn()
-const mockFirestoreGet = jest.fn().mockResolvedValue({
-  id: '123123',
-  data: () => ({
-    name: 'Lista da compras',
-    user_id: 'USER_ID',
-    items: [],
-    created_at: {
-      toDate: () => new Date()
-    },
-    updated_at: {
-      toDate: () => new Date()
-    }
+const mockFirestoreGet = jest.fn().mockImplementation(() =>
+  Promise.resolve({
+    id: '123123',
+    data: () => listDataWithoutItems
   })
-})
+)
 
 const mockNetInfo = jest.fn(() => ({ isConnected: true }))
 
@@ -31,7 +65,15 @@ jest.mock('@react-native-community/netinfo', () => ({
   useNetInfo: () => mockNetInfo()
 }))
 
-jest.mock('react-native-element-dropdown', () => jest.fn())
+jest.mock('react-native-element-dropdown', () => {
+  const reactNative = jest.requireActual('react-native')
+  const { View } = reactNative
+
+  return {
+    __esModule: true,
+    Dropdown: View
+  }
+})
 
 jest.mock('@react-native-firebase/firestore', () => ({
   __esModule: true,
@@ -85,6 +127,42 @@ describe('ListItem screen', () => {
         )
       ).toBeTruthy()
     })
-    // })
+  })
+
+  it('should show a message when there is no internet', async () => {
+    mockNetInfo.mockReturnValue({ isConnected: false })
+
+    const { findByText } = render(
+      <NavigationContext.Provider value={navContextValue}>
+        <ListItem />
+      </NavigationContext.Provider>
+    )
+
+    await act(async () => {
+      expect(
+        await findByText(
+          /Parece que você está sem internet, conecte-se para continuar/i
+        )
+      ).toBeTruthy()
+    })
+  })
+
+  it('should show 2 items on screen', async () => {
+    mockNetInfo.mockReturnValue({ isConnected: true })
+
+    mockFirestoreGet.mockResolvedValue({
+      id: '123123',
+      data: () => listDataWithItems
+    })
+
+    const { findAllByText } = render(
+      <NavigationContext.Provider value={navContextValue}>
+        <ListItem />
+      </NavigationContext.Provider>
+    )
+
+    await act(async () => {
+      expect(await findAllByText(/Item /i)).toHaveLength(2)
+    })
   })
 })
