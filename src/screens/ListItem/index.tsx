@@ -672,7 +672,7 @@ export function ListItem() {
                 errorMessage={errors.description?.message}
                 mb={16}
                 onBlur={() => {
-                  clearSuggestionList()
+                  setTimeout(clearSuggestionList, 1500)
                 }}
                 suggestions={suggestionsList}
                 onSuggestionPress={item => {
