@@ -368,9 +368,8 @@ export function ListItem() {
           return
         }
 
-        const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY)
+        const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY || '')
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
         model
           .generateContent(
             `Gere 5 items para um todolist chamado "${listName}" que comece com "${textInput}", o retorno deve ser um json contendo um array de objetos com o atributo item e seu valor`
@@ -378,18 +377,15 @@ export function ListItem() {
           .then(({ response }) => {
             if (response && response?.candidates) {
               const text = response.candidates[0]?.content.parts[0]?.text
-
               if (text) {
                 const textFormatted = text
                   .replace(/```\w*n/g, '')
                   .replace(/\n```/g, '')
                   .trim()
                 const textToJson = JSON.parse(textFormatted)
-
                 const { success, data } =
                   suggestionItemsSchema.safeParse(textToJson)
                 const suggestions = success ? data : []
-
                 setSuggestionsList(suggestions)
               } else {
                 clearSuggestionList()

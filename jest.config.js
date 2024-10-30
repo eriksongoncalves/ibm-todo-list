@@ -1,6 +1,12 @@
 module.exports = {
   preset: 'react-native',
-  testPathIgnorePatterns: ['/node_modules', '/android', '/ios', '/.expo'],
+  testPathIgnorePatterns: [
+    'node_modules',
+    'android',
+    'ios',
+    '.expo',
+    'coverage'
+  ],
   setupFilesAfterEnv: [
     '@testing-library/jest-native/extend-expect',
     './src/utils/jest/__mocks__/vector-icons.js',
@@ -9,9 +15,10 @@ module.exports = {
     './src/utils/jest/__mocks__/react-native-progress.js',
     './src/utils/jest/__mocks__/react-native-iphone-x-helper.js',
     './src/utils/jest/__mocks__/utils-analitycs.js',
+    './src/utils/jest/__mocks__/react-native-element-dropdown.js',
     './node_modules/react-native-gesture-handler/jestSetup.js'
   ],
-  modulePaths: ['<rootDir>/src/'],
+  modulePaths: ['<rootDir>/src/', '<rootDir>/.env'],
   collectCoverageFrom: [
     'src/**/*.ts(x)?',
     '!src/routes/**',

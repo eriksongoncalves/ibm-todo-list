@@ -73,5 +73,8 @@
     "react-test-renderer": "^18.3.1",
     "typescript": "^5.6.2"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "babel-plugin-ember-modules-api-polyfill": "2.13.0"
+  }
 }
