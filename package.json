@@ -11,7 +11,9 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint src --max-warnings=0",
     "prettier": "prettier --check '*/**/*.{ts,tsx}'",
-    "typecheck": "tsc --project tsconfig.json --noEmit"
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "build:android": "eas build -p android --profile preview",
+    "build:ios": "eas build -p ios --profile preview"
   },
   "dependencies": {
     "@expo-google-fonts/roboto": "^0.2.3",
