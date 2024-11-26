@@ -381,7 +381,7 @@ export function MyLists() {
         <LoadingScreen />
       ) : listData.length <= 0 ? (
         <Empty
-          description="Você ainda não tem nenhuma lista cadastrada ainda!"
+          description="Você não tem nenhuma lista cadastrada ainda!"
           actionDescription="Criar lista"
           onPress={handleAddNewList}
         />
