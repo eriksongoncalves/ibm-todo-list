@@ -112,9 +112,7 @@ describe('ListItem screen', () => {
 
     await act(async () => {
       expect(
-        await findByText(
-          /Você ainda não tem nenhum item adicionado na sua lista/i
-        )
+        await findByText(/Você não tem nenhum item adicionado na sua lista/i)
       ).toBeTruthy()
     })
   })

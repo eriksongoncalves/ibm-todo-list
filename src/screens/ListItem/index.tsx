@@ -546,7 +546,7 @@ export function ListItem() {
           <LoadingScreen />
         ) : listItems.length <= 0 && statusFilterSelected === undefined ? (
           <Empty
-            description="Você ainda não tem nenhum item adicionado na sua lista!"
+            description="Você não tem nenhum item adicionado na sua lista!"
             actionDescription="Adicionar um item"
             onPress={handleOpenFormModal}
           />
