@@ -372,7 +372,7 @@ export function ListItem() {
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
         model
           .generateContent(
-            `Gere 5 items para um todolist chamado "${listName}" que comece com "${textInput}", o retorno deve ser um json contendo um array de objetos com o atributo item e seu valor`
+            `Gere 5 items para um todolist chamado "${listName}" que comece com "${textInput}", o retorno deve ser um array de objetos com o atributo item e seu valor`
           )
           .then(({ response }) => {
             if (response && response?.candidates) {
