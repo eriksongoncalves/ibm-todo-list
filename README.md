@@ -17,6 +17,7 @@
 - Typescript
 - Zod
 - Gemini
+- Jest
 
 <br />
 
