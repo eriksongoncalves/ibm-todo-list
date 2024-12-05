@@ -32,11 +32,7 @@ import { GOOGLE_AI_API_KEY } from '@env'
 import { useNetInfo } from '@react-native-community/netinfo'
 
 import * as S from './styles'
-import {
-  ItemFormData,
-  itemFormResolver,
-  suggestionItemsSchema
-} from './validationSchema'
+import { ItemFormData, itemFormResolver } from './validationSchema'
 
 import { ListData, ListItemData } from '@shared/types/dtos/Lists'
 import { Button } from '@components/Button'
@@ -372,21 +368,22 @@ export function ListItem() {
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
         model
           .generateContent(
-            `Gere 5 items para um todolist chamado "${listName}" que comece com "${textInput}", o retorno deve ser um array de objetos com o atributo item e seu valor`
+            `Gere 3 items para um todolist chamado "${listName}" que comece com "${textInput}", separados por vírgula`
           )
           .then(({ response }) => {
             if (response && response?.candidates) {
-              const text = response.candidates[0]?.content.parts[0]?.text
+              const text = response.candidates[0]?.content.parts[0]?.text || ''
+
               if (text) {
-                const textFormatted = text
-                  .replace(/```\w*n/g, '')
-                  .replace(/\n```/g, '')
-                  .trim()
-                const textToJson = JSON.parse(textFormatted)
-                const { success, data } =
-                  suggestionItemsSchema.safeParse(textToJson)
-                const suggestions = success ? data : []
-                setSuggestionsList(suggestions)
+                const textFormatted = text.replace(/\s*,\s*/g, ',')
+                const suggestions = textFormatted.split(',') || []
+                const suggestionsFormatted: SuggestionsList[] = suggestions.map(
+                  suggestion => ({
+                    item: suggestion
+                  })
+                )
+
+                setSuggestionsList(suggestionsFormatted)
               } else {
                 clearSuggestionList()
               }
@@ -676,6 +673,7 @@ export function ListItem() {
                 }}
                 suggestions={suggestionsList}
                 onSuggestionPress={item => {
+                  console.log('>>> onSuggestionPress', item)
                   onChange(item)
                   clearSuggestionList()
                 }}
